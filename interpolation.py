@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
@@ -16,19 +17,17 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 			load = float(point)
 			t.append([x, z, load])
 		if n_chord is not None:
-			#print("non-interp: ", t)
-			load = np.array(t)[:,2].tolist()
-			x = np.array(t)[:,0].tolist()
 			t = interp(t, n_chord, N_x, l_a, z)
-			#print()
-			#print("interp: ", t)
-			#input()
-			new_load = np.array(t)[:,2].tolist()
-			new_x = np.array(t)[:,0].tolist()
-			plt.plot(x, load, linestyle='-', marker='v', linewidth=1)
-			plt.plot(new_x, new_load, linestyle='-', marker='x', linewidth=1)
-			plt.show()
 		data.append(t)
+	fig = plt.figure()
+	data = np.array(data)
+	x, z, load = data[:,:,0].flatten(), data[:,:,1].flatten(), data[:,:,2].flatten()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.scatter(x, z, load, marker="x")
+	ax.set_xlabel('X')
+	ax.set_ylabel('Z')
+	ax.set_zlabel('Load')
+	plt.show()
 	return data
 
 def comp_theta(i, N):
@@ -81,7 +80,4 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 		return load_a
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
-#interp_two_points(3, 1, 3)
-#print(z_coord(10, 81, 0.484))
-#print(x_coord(4, 41, 1.691))
-get_load(n_chord=200)
+get_load(n_chord=100)

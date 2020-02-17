@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
@@ -15,7 +16,18 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 			load = float(point)
 			t.append([x, z, load])
 		if n_chord is not None:
-			t = interp(t, n_chord, N_x, l_a)
+			#print("non-interp: ", t)
+			load = np.array(t)[:,2].tolist()
+			x = np.array(t)[:,0].tolist()
+			t = interp(t, n_chord, N_x, l_a, z)
+			#print()
+			#print("interp: ", t)
+			#input()
+			new_load = np.array(t)[:,2].tolist()
+			new_x = np.array(t)[:,0].tolist()
+			plt.plot(x, load, linestyle='-', marker='v', linewidth=1)
+			plt.plot(new_x, new_load, linestyle='-', marker='x', linewidth=1)
+			plt.show()
 		data.append(t)
 	return data
 
@@ -34,16 +46,21 @@ def x_coord(i, N_x, l_a):
 	x_i = 0.5 * (l_a / 2 * (1 - math.cos(theta)) + l_a/2 * (1 - math.cos(theta_1)))
 	return x_i
 
-def interp(data, n, N, l, coord=0):
+def interp(data, n, N, l, z_coord, coord=0):
+	new_data = []
 	coordinates = np.array(data)[:,coord].tolist()
 	interp_coordinates = interp_coords(coordinates, n, N, l, coord=0)
 	point_a, point_b = coordinates[0], coordinates[1]
 	last_coord_b = 1
+	points_a, points_b = [point_a], [point_b]
 	for new_coord in interp_coordinates:
 		if new_coord > point_b:
-			point_a, point_b = point_b, coordinates[last_coord_b+1]
-			last_coord_b += 1
-		print(point_a, point_b, new_coord)
+			if last_coord_b + 1 < len(coordinates):
+				point_a, point_b = point_b, coordinates[last_coord_b+1]
+				last_coord_b += 1
+		load = interp_two_points(new_coord, point_a, point_b, data[last_coord_b-1][2], data[last_coord_b][2])
+		new_data.append([new_coord, z_coord, load])
+	return new_data
 
 def interp_coords(coordinates, n, N, l, coord=0):
 	n = max(2, n)
@@ -60,9 +77,11 @@ def interp_coords(coordinates, n, N, l, coord=0):
 	return mesh_coords
 
 def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
+	if point_a == point_b:
+		return load_a
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 #interp_two_points(3, 1, 3)
 #print(z_coord(10, 81, 0.484))
 #print(x_coord(4, 41, 1.691))
-get_load(n_chord=80)
+get_load(n_chord=200)

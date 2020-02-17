@@ -24,4 +24,12 @@ file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=1, comments="*")
 file.close()
 
-for i in range(np.shape(elements)[0]):
+path = 'data/results.txt'
+file = open(path, "r")
+output = np.genfromtxt(path, delimiter=",", skip_header=3, comments="*")
+file.close()
+
+print(output)
+
+
+#for i in range(np.shape(elements)[0]):

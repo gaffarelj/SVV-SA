@@ -23,21 +23,21 @@ def roundintergration(sf_ab, sf_bnb, distance, thickness):
 	"""
 	return (sf_ab+sf_bnb)*distance/2/thickness
 
-def torsionstiffness(T,shearflows,t_skin,t_spar,distance_between_booms,ha):
+def torsionstiffness(T, shearflows, t_skin, t_spar, distance_between_booms, ha):
 	# 7 regions to calculate for left cell
 	spacing = spacinggenerator(distance_between_booms,ha)
 	a1 = math.pi*ha*ha/8
 	intergrations = []
 
-	for i in range(0,3): # semi circle above
+	for i in range(0, 3): # semi circle above
 		sfab, sfbnb = shearflows[i]
 		distance = spacing[i]
 		r = roundintergration(sfab, sfbnb, distance,t_skin)
 		intergrations.append(r)
-	a,b = shearflows[3]
-	r_spar = roundintergration(a,b,spacing[3],t_spar)
+	a, b = shearflows[3]
+	r_spar = roundintergration(a, b, spacing[3], t_spar)
 	intergrations.append(r_spar)
-	for i in range(4,len(shearflows)):
+	for i in range(4, len(shearflows)):
 		sfab, sfbnb = shearflows[i]
 		distance = spacing[i]
 		r = roundintergration(sfab, sfbnb, distance, t_skin)
@@ -56,7 +56,7 @@ distance = 0.07752484  # m
 t_skin = 0.0011  # thickness
 t_spar = 0.0025
 
-shearflows =[(0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)]
+shearflows = [(0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1)]
 print(len(shearflows))
 
 a = torsionstiffness(T, shearflows, t_skin, t_spar, distance, ha)

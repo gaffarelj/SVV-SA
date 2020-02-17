@@ -20,11 +20,23 @@ zy10 = [-0.094832, 0.067481]
 zy11 = [-0.170499, 0.050611]
 zy12 = [-0.246166, 0.033740]
 zy13 = [-0.321833, 0.016870]
-boomcoord = np.array(zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13)
+boomcoords = np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13])
 
 #stiffener area (in meters^2)
 stiff_area = 3/78125
 
-#centroid
-sumAzskin = (0.5*math.pi*Ha*tskin)*(Ha/math.pi)+2*(0.4068*tskin)*(-0.2034*math.cos(12.5687))
-sumAzboom = 0
+#enclosed area (in meters^2)
+
+#centroid (z-coordinate from hinge line)
+sumA_skin = (0.5*math.pi*Ha*tskin)+2*(0.4068*tskin)
+sumAz_skin = (0.5*math.pi*Ha*tskin)*(Ha/math.pi)+2*(0.4068*tskin)*(-0.2034*math.cos(12.5687))
+sumz_boom = 0
+for i in range(2):
+    sumz_boom += boomcoords[i,0]
+sumAz_boom = sumz_boom*stiff_area
+z_centroid = (sumAz_skin + sumAz_boom)/(sumA_skin + 13*stiff_area)
+
+print(z_centroid)
+
+
+

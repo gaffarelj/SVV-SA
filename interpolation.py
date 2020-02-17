@@ -5,31 +5,45 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
-	f = open("data/aerodynamicloadcrj700.dat").readlines()
+	"""
+	Get the aerodynamic load.
+	Inputs:
+		- C_a: chord length
+		- l_a: span length
+		- n_span: number of points to which to interpolate the load, span-wise
+		- n_chord: number of points to which to interpolate the load, chord-wise
+	"""
+	f = open("data/aerodynamicloadcrj700.dat").readlines()	# Open the aerodynamic load
 	data = []
-	for i, row in enumerate(f): # row is span-wise
-		t = []
-		N_z, N_x = len(f), len(row.split(","))
-		z = comp_coord(i, N_z, C_a, "z")
-		for j, point in enumerate(row.split(",")):
-			x = comp_coord(j, N_x, l_a, "x")
-			load = float(point)
-			t.append([x, z, load])
-		if n_chord is not None:
-			t = interp(t, n_chord, N_x, l_a, z, "x")
-		data.append(t)
-	plot_data(data)
+	for i, row in enumerate(f):						# Go trough all rows (span-wise)
+		row_d = []										# List to contain data from the row
+		N_z, N_x = len(f), len(row.split(","))		# The number of z/x coordinates = number of rows/columns
+		z = comp_coord(i, N_z, C_a, "z")			# Compute the z coordinate
+		for j, point in enumerate(row.split(",")):	# Go trough all columns of the row
+			x = comp_coord(j, N_x, l_a, "x")		# Compute the x coordinate
+			load = 1000 * float(point)				# Convert the string load to a float, in [N] instead of [kN]
+			row_d.append([x, z, load])				# Save the x, z coord. and the load to a temp list
+		if n_chord is not None:						# If n_chord had been specified for interpolation...
+			# ...interpolate new loads along the x-axis (chord-wise)
+			row_d = interp(row_d, n_chord, N_x, l_a, z, "x")
+		data.append(row_d)							# Save the data of the row
+	plot_data(data)									# Plot all data in 3D
 	return data
 
 def plot_data(data):
+	"""
+	Plot the resulting data in 3D
+	"""
 	fig = plt.figure()
-	data = np.array(data)
+	data = np.array(data) # Convert the list to a numpy array
+	# Extract the x, z, and load from the multidimensional data array
 	x, z, load = data[:,:,0].flatten(), data[:,:,1].flatten(), data[:,:,2].flatten()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(x, z, load, marker="x")
-	ax.set_xlabel('X')
-	ax.set_ylabel('Z')
-	ax.set_zlabel('Load')
+	ax.set_xlabel('X [m]')
+	ax.set_ylabel('Z [m]')
+	ax.set_zlabel('Load [N]')
+	ax.set_title('Aerodynamic load over the aileron')
 	plt.show()
 
 def comp_theta(i, N):
@@ -54,23 +68,29 @@ def comp_coord(i, N, l, c_type):
 	return coord
 
 def interp(data, n, N, l, other_coord, c_type):
+	"""
+	Interpolate the dataset to n new points
+	Inputs:
+		- data: given dataset, to be interpolated
+		- n: number of points to which to interpolate
+		- N: number of rows/columns in the existing dataset
+		- other_coord: coordinate list that won't be interpolated
+		- c_type: coordinate type/direction: "x" or "z"
+	"""
 	new_data = []
-	coord = 0 if c_type == "x" else 1
-	coordinates = np.array(data)[:,coord].tolist()
-	interp_coordinates = interp_coords(coordinates, n, N, l, c_type=c_type)
-	point_a, point_b = coordinates[0], coordinates[1]
-	last_coord_b = 1
-	points_a, points_b = [point_a], [point_b]
-	for new_coord in interp_coordinates:
-		if new_coord > point_b:
-			if last_coord_b + 1 < len(coordinates):
-				point_a, point_b = point_b, coordinates[last_coord_b+1]
-				last_coord_b += 1
+	idx = 0 if c_type == "x" else 1						# Index at which the existing ciird, has been stored in the data
+	coordinates = np.array(data)[:,idx].tolist()		# Extract the coordinate (to be interpolated) from the data
+	interp_coordinates = interp_coords(coordinates, n, N, l, c_type)	# Interpolate the existing coord. to n new coord.
+	point_a, point_b = coordinates[0], coordinates[1]	# Set the first point before and after the new inter. coord. 
+	last_coord_b = 1									# Save the index of the point b
+	for new_coord in interp_coordinates:				# Go through all interpolated coordinates
+		if new_coord > point_b and last_coord_b + 1 < len(coordinates):	# If the interpolated coord. is above point b...
+				point_a, point_b = point_b, coordinates[last_coord_b+1]	# ...set point a as previous point b, and b as next
+				last_coord_b += 1	# Save the index of the new point b
+		# Interpolate the load at the interp. coordinate, between the loads at points a and b
 		load = interp_two_points(new_coord, point_a, point_b, data[last_coord_b-1][2], data[last_coord_b][2])
-		if c_type == "z":
-			new_data.append([new_coord, other_coord, load])
-		else:
-			new_data.append([other_coord, new_coord, load])
+		# Save the load, new interp. coord., and unchanged coord. in the new data array
+		new_data.append([new_coord, other_coord, load]) if c_type == "z" else new_data.append([other_coord, new_coord, load])
 	return new_data
 
 def interp_coords(coordinates, n, N, l, c_type):
@@ -103,5 +123,6 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	# The load at the new coordinate is interpolated by fitting a line to the known
 	# load before and after that new coordinate
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
+
 
 get_load(n_chord=100)

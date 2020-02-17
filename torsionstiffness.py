@@ -3,12 +3,24 @@ import math
 # j = T/(G*dtheta/dz)
 
 def spacinggenerator(distance, ha):
-	skin_spar = math.pi*ha/4 - 2*distance
+	"""
+	Return the list of length of 7 parts in left cell
+	Input:
+	- distance: the distance calculated between evenly distributed booms
+	- ha: height of the aileron
+	"""
+	skin_spar = math.pi*ha/4 - 2*distance # the tiny part on semi circle on the left to spar
 	result = [distance, distance, skin_spar, ha, skin_spar, distance, distance]
 	print(result)
 	return result
 
-def roundintergration(sf_ab, sf_bnb, distance, thickness): # shearflow after boom and before next boom for each section
+def roundintergration(sf_ab, sf_bnb, distance, thickness):
+	"""
+	Round integration between booms
+	Inputs:
+	- sf_ab: shear flow after the boom
+	- sf_bnb: shear flow before next boom
+	"""
 	return (sf_ab+sf_bnb)*distance/2/thickness
 
 def torsionstiffness(T,shearflows,t_skin,t_spar,distance_between_booms,ha):
@@ -32,14 +44,14 @@ def torsionstiffness(T,shearflows,t_skin,t_spar,distance_between_booms,ha):
 		intergrations.append(r)
 
 	print(intergrations)
-	G_dtheta_dz = sum(intergrations)/2/a1
 
+	G_dtheta_dz = sum(intergrations)/2/a1
 	J = T/G_dtheta_dz
 	return J
 
 
 T = 1  # torsion
-ha = 2  # height of aileron
+ha = 17.3/100  # height of aileron, m
 distance = 0.07752484  # m
 t_skin = 0.0011  # thickness
 t_spar = 0.0025

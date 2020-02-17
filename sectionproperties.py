@@ -41,7 +41,18 @@ z_centroid = (sumAz_skin + sumAz_boom)/(sumA_skin + 13*stiff_area)
 #moments of inertia (Iyy and Izz about the hinge line, in m^4)
 #Iyy
 Iyy_thin = ((tskin*0.4068**3*(math.cos(beta))**2)/12)+tskin*0.4068*(0.2034*math.cos(beta))**2
+Iyy_ring = 0
+Iyy_booms = 0
+for i in range(13):
+    Iyy_booms += (boomcoords[i,0])**2 * stiff_area
+Iyy_total = Iyy_thin + Iyy_ring + Iyy_booms
 
-
+#Izz
+Izz_thin = ((tskin*0.4068**3*(math.sin(beta))**2)/12)+tskin*0.4068*(0.2034*math.sin(beta))**2
+Izz_ring = 0
+Izz_booms = 0
+for i in range(13):
+    Izz_booms += (boomcoords[i,1])**2 * stiff_area
+Izz_total = Izz_thin + Izz_ring + Izz_booms
 
 

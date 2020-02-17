@@ -4,6 +4,7 @@ import numpy as np
 Ha = 0.173
 Ca = 0.484
 tskin = 0.0011
+beta = math.radians(12.5687)
 
 #stiffener positions (origin at hinge line, from bottom left going clockwise, in meters)
 #[z, y]
@@ -26,17 +27,21 @@ boomcoords = np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, 
 stiff_area = 3/78125
 
 #enclosed area (in meters^2)
+Am = math.pi*(Ha/2)**2+0.3975*0.0865
 
 #centroid (z-coordinate from hinge line)
 sumA_skin = (0.5*math.pi*Ha*tskin)+2*(0.4068*tskin)
-sumAz_skin = (0.5*math.pi*Ha*tskin)*(Ha/math.pi)+2*(0.4068*tskin)*(-0.2034*math.cos(12.5687))
+sumAz_skin = (0.5*math.pi*Ha*tskin)*(Ha/math.pi)+2*(0.4068*tskin)*(-0.2034*math.cos(beta))
 sumz_boom = 0
-for i in range(2):
+for i in range(13):
     sumz_boom += boomcoords[i,0]
 sumAz_boom = sumz_boom*stiff_area
 z_centroid = (sumAz_skin + sumAz_boom)/(sumA_skin + 13*stiff_area)
 
-print(z_centroid)
+#moments of inertia (Iyy and Izz about the hinge line, in m^4)
+#Iyy
+Iyy_thin = ((tskin*0.4068**3*(math.cos(beta))**2)/12)+tskin*0.4068*(0.2034*math.cos(beta))**2
+
 
 
 

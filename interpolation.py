@@ -16,8 +16,10 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 	f = open("data/aerodynamicloadcrj700.dat").readlines()	# Open the aerodynamic load
 	data = []
 	for i, row in enumerate(f):						# Go trough all rows (span-wise)
-		row_d = []										# List to contain data from the row
+		row_d = []									# List to contain data from the row
 		N_z, N_x = len(f), len(row.split(","))		# The number of z/x coordinates = number of rows/columns
+		if n_chord is None:							# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
+			n_chord = N_x
 		z = comp_coord(i, N_z, C_a, "z")			# Compute the z coordinate
 		for j, point in enumerate(row.split(",")):	# Go trough all columns of the row
 			x = comp_coord(j, N_x, l_a, "x")		# Compute the x coordinate
@@ -27,24 +29,17 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 			# ...interpolate new loads along the x-axis (chord-wise)
 			row_d = interp(row_d, n_chord, N_x, l_a, z, "x")
 		data.append(row_d)							# Save the data of the row
-	if n_span is not None:
+	if n_span is not None:							# If n_span had been specified for interpolation...
 		interp_data = []
 		i = 0
-		for column in zip(*data):
-			#print(column)
-			#print()
+		for column in zip(*data):					# Go through every column
 			column = np.array(column)
-			x, z, load = column[:,0], column[:,1], column[:,2]
-			#plt.plot(x, load, marker="x")
+			x, z, load = column[:,0], column[:,1], column[:,2]	# Extract data from the column
 			try:
+				# Apply linear interpolation on the column
 				column_interp = interp(column.tolist(), n_span, N_z, C_a, x[i], "z")
-				#print(column_interp)
-				column = np.array(column_interp)
-				x, z, load = column[:,0], column[:,1], column[:,2]
-				#plt.plot(x, load, marker="x")
-				#plt.show()
-				interp_data.append(column_interp)
-			except IndexError:
+				interp_data.append(column_interp)	# Save the interpolated data
+			except IndexError:						# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
 				pass
 			i += 1
 		data = list(zip(*interp_data))
@@ -99,29 +94,18 @@ def interp(data, n, N, l, other_coord, c_type):
 		- c_type: coordinate type/direction: "x" or "z"
 	"""
 	new_data = []
-	coordinates = np.array(data)[:,0].tolist()		# Extract the coordinate (to be interpolated) from the data
-	interp_coordinates = interp_coords(coordinates, n, N, l, c_type)	# Interpolate the existing coord. to n new coord.
-	#if c_type == "z":
-	#	print("c", coordinates)
-	#	print()
-	#	print("c_i", interp_coordinates)
-	#	plt.plot(coordinates, [1 for i in coordinates], marker="x")
-	#	plt.plot(interp_coordinates, [2 for i in interp_coordinates], marker="x")
-	#	plt.show()
-	#	print(len(coordinates), len(interp_coordinates))
-	#	input()
-	point_a, point_b = coordinates[0], coordinates[1]	# Set the first point before and after the new inter. coord. 
-	last_coord_b = 1									# Save the index of the point b
-	for new_coord in interp_coordinates:				# Go through all interpolated coordinates
+	coordinates = np.array(data)[:,0].tolist()								# Extract the coordinate (to be interpolated) from the data
+	interp_coordinates = interp_coords(coordinates, n, N, l, c_type)		# Interpolate the existing coord. to n new coord.
+	point_a, point_b = coordinates[0], coordinates[1]						# Set the first point before and after the new inter. coord. 
+	last_coord_b = 1														# Save the index of the point b
+	for new_coord in interp_coordinates:									# Go through all interpolated coordinates
 		# If the interpolated coord. is above point b...
 		if (c_type == "x" and new_coord > point_b) or (c_type == "z" and new_coord < point_b) and last_coord_b + 1 < len(coordinates):
 			try:
 				point_a, point_b = point_b, coordinates[last_coord_b + 1]	# ...set point a as previous point b, and b as next
 				last_coord_b += 1											# Save the index of the new point b
-			except IndexError:
+			except IndexError:												# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
 				pass
-		#if new_coord < point_a or new_coord > point_b:
-		#	print(new_coord, point_a, point_b)
 		# Interpolate the load at the interp. coordinate, between the loads at points a and b
 		load = interp_two_points(new_coord, point_a, point_b, data[last_coord_b-1][2], data[last_coord_b][2])
 		# Save the load, new interp. coord., and unchanged coord. in the new data array
@@ -140,11 +124,7 @@ def interp_coords(coordinates, n, N, l, c_type):
 	"""
 	n = max(2, n)						# Make sure there is at least two points for the interpolation
 	mesh_size = N / n					# Compute the mesh size: existing number of coord. / specified for interp.
-	#if c_type == "z":
-	#	print(N, n, mesh_size, c_type)
-	#	input()
 	mesh_coords = [coordinates[0]]		# Set first interp. coord. as the first existing one
-	#print(mesh_coords)
 	for i in range(1, n-1):				# Compute new interp. coord. 
 		mesh_i = i * mesh_size			# Fake row/column index = mesh size * step
 		mesh_coord = comp_coord(mesh_i, N, l, c_type)	# Compute the actual coordinate, as from row/column index
@@ -164,4 +144,4 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 
-get_load(n_chord=75, n_span=150)
+get_load(n_chord=None, n_span=150)

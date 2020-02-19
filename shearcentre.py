@@ -1,6 +1,7 @@
 from integration import integrate
 import math
 import sectionproperties as sp
+import numpy as np
 
 Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge, stiff_area = sp.get_geometry()
 Ha = 0.173
@@ -10,6 +11,7 @@ hstiff = 0.014
 tstiff = 0.0012
 wstiff = 0.018
 beta = math.atan(8.65 / 39.75)
+l_topskin = 0.3975/math.cos(beta)
 r = Ha / 2
 
 
@@ -81,3 +83,79 @@ def qb_6(theta):  # -pi/2 to 0
     else:
         qb = c * ((tskin * r ** 2) * integrate(math.sin, -math.pi/2, theta) + stiff_area * boomcoords[5, 1]) + qb_5(0.0865) + qb_4(0.4068)
     return qb
+
+
+# REDUNDANT SHEAR
+
+def qs(n):
+    # CELL I
+    # SECTION 1 - base
+    int_qb1 = 0
+    for i in range(1, n+1):
+        int_qb1 += (qb_1(i*(math.pi/(2*n))) * ((math.pi * r)/(2*n)))/tskin
+
+    # SECTION 2 - base (cell I)
+    int_qb2I = 0
+    for i in range(1, n+1):
+        int_qb2I += (qb_2(r-i*(r/n)) * (r/n))/tspar
+
+    # SECTION 5 - base (cell I)
+    int_qb5I = 0
+    for i in range(1, n+1):
+        int_qb5I += (qb_5(i*(r/n)) * (r/n))/tspar
+
+    # SECTION 6 - base
+    int_qb6 = 0
+    for i in range(1, n+1):
+        int_qb6 += (qb_6((-math.pi/2)+i*(math.pi/(2*n))) * ((math.pi * r)/(2*n)))/tskin
+
+    qb_intI = int_qb1 + int_qb2I + int_qb5I + int_qb6
+
+    # CELL II
+    # SECTION 2 - base (cell II)
+    int_qb2II = 0
+    for i in range(1, n+1):
+        int_qb2II += (qb_2(i*(r/n)) * (r/n))/tspar
+
+    # SECTION 3 - base
+    int_qb3 = 0
+    for i in range(1, n+1):
+        int_qb3 = (qb_3(i*(l_topskin/n)) * (l_topskin/n))/tskin
+
+    # SECTION 4 - base
+    int_qb4 = 0
+    for i in range(1, n+1):
+        int_qb4 = (qb_4(i*(l_topskin/n)) * (l_topskin/n))/tskin
+
+    # SECTION 5 - base (cell II)
+    int_qb5II = 0
+    for i in range(1, n+1):
+        int_qb5II += (qb_5(r-i*(r/n)) * (r/n))/tspar
+
+    qb_intII = int_qb2II + int_qb3 + int_qb4 + int_qb5II
+    return qb_intI, qb_intII
+
+    # SYSTEM SOLVING
+    eqs = np.array([[((2*r)/tspar)+((2*r*math.pi)/tskin), (-(2*r)/tspar)], [(-(2*r)/tspar), ((2*r)/tspar)+(2*l_topskin)]])
+    cs = np.array([-(qb_intI), -(qb_intII)])
+    qsI, qsII = np.linalg.solve(eqs, cs)
+    return qsI, qsII
+
+# MASTER FUNCTION
+def q(section, s, n):
+    qsI, qsII = qs(n)
+    if section == 1:
+        q = qb_1(s) + qsI
+    elif section == 2:
+        q = qb_2(s) - qsI + qsII
+    elif section == 3:
+        q = qb_3(s) + qsII
+    elif section == 4:
+        q = qb_4(s) + qsII
+    elif section == 5:
+        q = qb_5(s) + qsI - qsII
+    elif section == 6:
+        q = qb_6(s) + qsI
+    else:
+        print("Not a valid section")
+    return q

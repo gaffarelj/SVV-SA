@@ -9,3 +9,6 @@ def vmstress(shearstress,mz,my):
 	- mz:
 	- my:
 	"""
+
+	vm = math.sqrt(sigma_xx**2+3*tau_yz**2)
+	return vm

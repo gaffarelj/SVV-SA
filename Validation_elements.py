@@ -1,4 +1,18 @@
 import numpy as np
+from matplotlib import pyplot as plt
+import matplotlib.cm as cmx
+import matplotlib
+from mpl_toolkits.mplot3d import Axes3D
+def scatter3d(x,y,z, cs, colorsMap='jet'):
+    cm = plt.get_cmap(colorsMap)
+    cNorm = matplotlib.colors.Normalize(vmin=min(cs), vmax=max(cs))
+    scalarMap = cmx.ScalarMappable( cmap=cm)
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
+    scalarMap.set_array(cs)
+    fig.colorbar(scalarMap)
+    plt.show()
 '''
 def opentext(filename):
     lijst = [filename, '.txt']
@@ -98,7 +112,12 @@ for j in range(np.shape(elements)[0]):
     data[j, 3] = (data_frame[j, 2] + data_frame[j, 3]) / 2
     data[j, 4] = (data_frame[j, 4] + data_frame[j, 5]) / 2
 
-print(data)
+
+
+data = data.transpose()
+
+
+scatter3d(data[0],data[1],data[2],data[3])
 
 '''
 elementarray = []

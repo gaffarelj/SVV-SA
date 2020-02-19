@@ -19,7 +19,6 @@ nodeline = cut_text(text1, '\n')
 nodeline0 = nodeline[0]
 
 
-
 allnodes = []
 for i in range(len(nodeline)):
     nodeline[i] = ''.join(nodeline[i].split())

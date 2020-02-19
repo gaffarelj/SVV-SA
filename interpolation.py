@@ -137,7 +137,7 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	Interpolate the load between two points.
 	Point a is before the new coordinate, point b after.
 	"""
-	if point_a == point_b:	# Make sure point a is different to point b (zero division)
+	if point_a == point_b:	# Make sure point a is different to point b (no zero division)
 		return load_a
 	# The load at the new coordinate is interpolated by fitting a line to the known
 	# load before and after that new coordinate

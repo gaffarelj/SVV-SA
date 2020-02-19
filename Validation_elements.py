@@ -55,8 +55,20 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
+path = 'data/Bending_result_dat.csv'
+file = open(path, "r")
+data_frame = np.genfromtxt(path, delimiter=",", skip_header=15)
+file.close()
+
 # define a collecting array for all result data
 data = np.zeros((np.size(elements),5))
+
+
+
+
+
+
+
 
 #data[:,0] = np.sum(nodes[np.where(elements[1])])/4
 

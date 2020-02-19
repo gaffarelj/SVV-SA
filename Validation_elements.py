@@ -64,12 +64,6 @@ file.close()
 data = np.zeros((np.size(elements),5))
 
 
-
-
-
-
-
-
 #data[:,0] = np.sum(nodes[np.where(elements[1])])/4
 
 #print(elements[0])
@@ -100,8 +94,11 @@ for j in range(np.shape(elements)[0]):
     data[j,0] = summationx/4
     data[j,1] = summationy/4
     data[j,2] = summationz/4
+    # add the von misses & shear stresses to the data_frame
+    data[j, 3] = (data_frame[j, 2] + data_frame[j, 3]) / 2
+    data[j, 4] = (data_frame[j, 4] + data_frame[j, 5]) / 2
 
-
+print(data)
 
 '''
 elementarray = []

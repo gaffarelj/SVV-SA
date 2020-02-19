@@ -20,14 +20,14 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 		N_z, N_x = len(f), len(row.split(","))		# The number of z/x coordinates = number of rows/columns
 		if n_chord is None:							# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
 			n_chord = N_x
-		z = comp_coord(i, N_z, C_a, "z")			# Compute the z coordinate
+		z = comp_coord(i, N_z, l_a, "z")			# Compute the z coordinate
 		for j, point in enumerate(row.split(",")):	# Go trough all columns of the row
-			x = comp_coord(j, N_x, l_a, "x")		# Compute the x coordinate
+			x = comp_coord(j, N_x, C_a, "x")		# Compute the x coordinate
 			load = 1000 * float(point)				# Convert the string load to a float, in [N] instead of [kN]
 			row_d.append([x, z, load])				# Save the x, z coord. and the load to a temp list
 		if n_chord is not None:						# If n_chord had been specified for interpolation...
 			# ...interpolate new loads along the x-axis (chord-wise)
-			row_d = interp(row_d, n_chord, N_x, l_a, z, "x")
+			row_d = interp(row_d, n_chord, N_x, C_a, z, "x")
 		data.append(row_d)							# Save the data of the row
 	if n_span is not None:							# If n_span had been specified for interpolation...
 		interp_data = []
@@ -37,7 +37,7 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 			x, z, load = column[:,0], column[:,1], column[:,2]	# Extract data from the column
 			try:
 				# Apply linear interpolation on the column
-				column_interp = interp(column.tolist(), n_span, N_z, C_a, x[i], "z")
+				column_interp = interp(column.tolist(), n_span, N_z, l_a, z[0], "z")
 				interp_data.append(column_interp)	# Save the interpolated data
 			except IndexError:						# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
 				pass
@@ -56,8 +56,8 @@ def plot_data(data):
 	x, z, load = data[:,:,0].flatten(), data[:,:,1].flatten(), data[:,:,2].flatten()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(x, z, load, marker="x")
-	ax.set_xlabel('X [m]')
-	ax.set_ylabel('Z [m]')
+	ax.set_xlabel('X (span) [m]')
+	ax.set_ylabel('Z (chord) [m]')
 	ax.set_zlabel('Load [N]')
 	ax.set_title('Aerodynamic load over the aileron')
 	plt.show()
@@ -144,4 +144,4 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 
-get_load(n_chord=None, n_span=150)
+get_load(n_chord=75, n_span=150)

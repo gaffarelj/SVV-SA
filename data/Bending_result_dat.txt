@@ -1,5 +1,4 @@
 ---------
-
    ODB: C:/Scratch/B737.odb
    Step: Bending
    Frame: Increment      1: Step Time =    1.000

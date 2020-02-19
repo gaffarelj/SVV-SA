@@ -1,4 +1,5 @@
-
+import numpy as np
+'''
 def opentext(filename):
     lijst = [filename, '.txt']
     filename = ''.join(lijst)
@@ -13,7 +14,7 @@ def cut_text(text, cutsym):
     return arrayperline
 def plotxyz(array):
     return
-text1 = opentext('nodes')
+text1 = opentext('data/nodes')
 nodeline = cut_text(text1, '\n')
 nodeline0 = nodeline[0]
 
@@ -26,7 +27,7 @@ for i in range(len(nodeline)):
         nodelist[i] = float(nodelist[i])
     allnodes.append(nodelist)
 
-text1 = opentext('elements')
+text1 = opentext('data/elements')
 nodeline = cut_text(text1, '\n')
 nodeline0 = nodeline[0]
 allelements = []
@@ -41,8 +42,65 @@ map(float, allelements)
 
 #print('allnodes', allnodes)
 #print('allelements', allelements)
-
+'''
 # starting to couple every element with 4 points.
+
+path = 'data/nodes.txt'
+file = open(path, "r")
+nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )
+file.close()
+
+path = 'data/elements.txt'
+file = open(path, "r")
+elements = np.genfromtxt(path, delimiter=",", skip_header=0)
+file.close()
+
+path = 'data/Bending_result_dat.csv'
+file = open(path, "r")
+data_frame = np.genfromtxt(path, delimiter=",", skip_header=15)
+file.close()
+
+# define a collecting array for all result data
+data = np.zeros((np.size(elements),5))
+
+
+#data[:,0] = np.sum(nodes[np.where(elements[1])])/4
+
+#print(elements[0])
+#currentcoords = elements[0,1:]
+#print(currentcoords)
+#print(nodes[int(currentcoord)-1])
+
+#average_x = (nodes[int(currentcoords[0])-1,1] + nodes[int(currentcoords[1])-1,1] + nodes[int(currentcoords[2])-1,1] + nodes[int(currentcoords[3])-1,1])/4
+#print(average_x)
+
+#nested loop finds the averages (integration points) of all elements and stores them in data array
+# at the first 3 positions, the last 2 positions are reserved for the average stress and shear stress from
+# top to bottom
+
+for j in range(np.shape(elements)[0]):
+
+    currentcoords = elements[j,1:]
+
+    summationx = 0
+    summationy = 0
+    summationz = 0
+
+    for i in range(4):
+        summationx += nodes[int(currentcoords[i])-1,1]
+        summationy += nodes[int(currentcoords[i])-1,2]
+        summationz += nodes[int(currentcoords[i])-1,3]
+
+    data[j,0] = summationx/4
+    data[j,1] = summationy/4
+    data[j,2] = summationz/4
+    # add the von misses & shear stresses to the data_frame
+    data[j, 3] = (data_frame[j, 2] + data_frame[j, 3]) / 2
+    data[j, 4] = (data_frame[j, 4] + data_frame[j, 5]) / 2
+
+print(data)
+
+'''
 elementarray = []
 print(len(allelements))
 for i in range(len(allelements)):
@@ -63,3 +121,6 @@ for i in range(len(allelements)):
     print(elementlist)
     elementarray.append(elementlist)
 # print (elementarray)
+
+
+'''

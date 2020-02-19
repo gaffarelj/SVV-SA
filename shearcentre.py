@@ -11,7 +11,7 @@ hstiff = 0.014
 tstiff = 0.0012
 wstiff = 0.018
 beta = math.atan(8.65 / 39.75)
-l_topskin = 0.3975/math.cos(beta)
+l_topskin = 0.3975 / math.cos(beta)
 r = Ha / 2
 
 
@@ -39,26 +39,26 @@ def qb_3(s3):  # 0 to 0.4068
     boom9_s3 = -boomcoords_hinge[8, 0] / math.cos(beta)
     boomspace_s3 = (boomcoords_hinge[8, 0] - boomcoords_hinge[9, 0]) / math.cos(beta)
     if s3 < boom9_s3:
-        qb = c * tskin * integrate(lambda x: r - x * math.sin(beta), 0, s3) + qb_1(math.pi/2) + qb_2(0.0865)
+        qb = c * tskin * integrate(lambda x: r - x * math.sin(beta), 0, s3) + qb_1(math.pi / 2) + qb_2(0.0865)
     else:
-        nbooms = int((s3 - boom9_s3) / boomspace_s3)+1
+        nbooms = int((s3 - boom9_s3) / boomspace_s3) + 1
         qb_booms = 0
         for i in range(8, 8 + nbooms):
             qb_booms += stiff_area * boomcoords_hinge[i, 1]
         qb_skin = tskin * integrate(lambda x: r - x * math.sin(beta), 0, s3)
-        qb = c * (qb_skin + qb_booms) + qb_1(math.pi/2) + qb_2(0.0865)
+        qb = c * (qb_skin + qb_booms) + qb_1(math.pi / 2) + qb_2(0.0865)
     return qb
 
 
 # SECTION 4
 def qb_4(s4):  # 0 to 0.4068
     c = -1 / Izz
-    boom1_s4 = (Ca-r+boomcoords_hinge[0, 0]) / math.cos(beta)
+    boom1_s4 = (Ca - r + boomcoords_hinge[0, 0]) / math.cos(beta)
     boomspace_s4 = -(boomcoords_hinge[0, 0] - boomcoords_hinge[1, 0]) / math.cos(beta)
     if s4 < boom1_s4:
         qb = c * integrate(lambda x: -tskin * math.sin(beta) * x, 0, s4) + qb_3(0.4068)
     else:
-        nbooms = int((s4 - boom1_s4) / boomspace_s4)+1
+        nbooms = int((s4 - boom1_s4) / boomspace_s4) + 1
         qb_booms = 0
         for i in range(0, 0 + nbooms):
             qb_booms += stiff_area * boomcoords_hinge[i, 1]
@@ -79,9 +79,10 @@ def qb_6(theta):  # -pi/2 to 0
     c = -1 / Izz
     boom6_theta = math.asin(boomcoords[5, 1] / r)
     if theta < boom6_theta:
-        qb = c * (tskin * r ** 2) * integrate(math.sin, math.pi/2, theta) + qb_5(0.0865) + qb_4(0.4068)
+        qb = c * (tskin * r ** 2) * integrate(math.sin, math.pi / 2, theta) + qb_5(0.0865) + qb_4(0.4068)
     else:
-        qb = c * ((tskin * r ** 2) * integrate(math.sin, -math.pi/2, theta) + stiff_area * boomcoords[5, 1]) + qb_5(0.0865) + qb_4(0.4068)
+        qb = c * ((tskin * r ** 2) * integrate(math.sin, -math.pi / 2, theta) + stiff_area * boomcoords[5, 1]) + qb_5(
+            0.0865) + qb_4(0.4068)
     return qb
 
 
@@ -91,55 +92,56 @@ def qs(n):
     # CELL I
     # SECTION 1 - base
     int_qb1 = 0
-    for i in range(1, n+1):
-        int_qb1 += (qb_1(i*(math.pi/(2*n))) * ((math.pi * r)/(2*n)))/tskin
-
+    for i in range(1, n + 1):
+        int_qb1 += (qb_1(i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n))) / tskin
+    print('Finished qs section 1, int_qb1 = ', int_qb1)
     # SECTION 2 - base (cell I)
     int_qb2I = 0
-    for i in range(1, n+1):
-        int_qb2I += (qb_2(r-i*(r/n)) * (r/n))/tspar
-
+    for i in range(1, n + 1):
+        int_qb2I += (qb_2(r - i * (r / n)) * (r / n)) / tspar
+    print('Finished qs section 2, cell I, int_qb2I = ', int_qb2I)
     # SECTION 5 - base (cell I)
     int_qb5I = 0
-    for i in range(1, n+1):
-        int_qb5I += (qb_5(i*(r/n)) * (r/n))/tspar
-
+    for i in range(1, n + 1):
+        int_qb5I += (qb_5(i * (r / n)) * (r / n)) / tspar
+    print('Finished qs section 5, cell I, int_qb5I = ', int_qb5I)
     # SECTION 6 - base
     int_qb6 = 0
-    for i in range(1, n+1):
-        int_qb6 += (qb_6((-math.pi/2)+i*(math.pi/(2*n))) * ((math.pi * r)/(2*n)))/tskin
-
-    qb_intI = int_qb1 + int_qb2I + int_qb5I + int_qb6
+    for i in range(1, n + 1):
+        int_qb6 += (qb_6((-math.pi / 2) + i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n))) / tskin
+    print('Finished qs section 8, int_qb6 = ', int_qb6)
+    qb_intI = int_qb1 - int_qb2I + int_qb5I + int_qb6
 
     # CELL II
     # SECTION 2 - base (cell II)
     int_qb2II = 0
-    for i in range(1, n+1):
-        int_qb2II += (qb_2(i*(r/n)) * (r/n))/tspar
+    for i in range(1, n + 1):
+        int_qb2II += (qb_2(i * (r / n)) * (r / n)) / tspar
 
     # SECTION 3 - base
     int_qb3 = 0
-    for i in range(1, n+1):
-        int_qb3 = (qb_3(i*(l_topskin/n)) * (l_topskin/n))/tskin
+    for i in range(1, n + 1):
+        int_qb3 = (qb_3(i * (l_topskin / n)) * (l_topskin / n)) / tskin
 
     # SECTION 4 - base
     int_qb4 = 0
-    for i in range(1, n+1):
-        int_qb4 = (qb_4(i*(l_topskin/n)) * (l_topskin/n))/tskin
+    for i in range(1, n + 1):
+        int_qb4 = (qb_4(i * (l_topskin / n)) * (l_topskin / n)) / tskin
 
     # SECTION 5 - base (cell II)
     int_qb5II = 0
-    for i in range(1, n+1):
-        int_qb5II += (qb_5(r-i*(r/n)) * (r/n))/tspar
+    for i in range(1, n + 1):
+        int_qb5II += (qb_5(r - i * (r / n)) * (r / n)) / tspar
 
-    qb_intII = int_qb2II + int_qb3 + int_qb4 + int_qb5II
-    return qb_intI, qb_intII
+    qb_intII = int_qb2II + int_qb3 + int_qb4 - int_qb5II
 
     # SYSTEM SOLVING
-    eqs = np.array([[((2*r)/tspar)+((2*r*math.pi)/tskin), (-(2*r)/tspar)], [(-(2*r)/tspar), ((2*r)/tspar)+(2*l_topskin)]])
-    cs = np.array([-(qb_intI), -(qb_intII)])
+    eqs = np.array([[((2 * r) / tspar) + ((2 * r * math.pi) / tskin), (-(2 * r) / tspar)],
+                    [(-(2 * r) / tspar), ((2 * r) / tspar) + (2 * l_topskin)]])
+    cs = np.array([-qb_intI, -qb_intII])
     qsI, qsII = np.linalg.solve(eqs, cs)
     return qsI, qsII
+
 
 # MASTER FUNCTION
 def q(section, s, n):
@@ -159,3 +161,33 @@ def q(section, s, n):
     else:
         print("Not a valid section")
     return q
+
+# SHEAR CENTRE
+def shear_centre(n):
+    # SECTION 1
+    int_q1 = 0
+    for i in range(1, n + 1):
+        int_q1 += (q(1, i * (math.pi / (2 * n)), n) * ((math.pi * r) / (2 * n)))
+    m1 = int_q1 * r
+
+    # SECTION 3
+    int_q3 = 0
+    for i in range(1, n + 1):
+        int_q3 = (q(3, i * (l_topskin / n), n) * (l_topskin / n))
+    m3 = int_q3 * math.cos(beta) * r
+
+    # SECTION 4
+    int_q4 = 0
+    for i in range(1, n + 1):
+        int_q4 = (q(4, i * (l_topskin / n), n) * (l_topskin / n))
+    m4 = int_q4 * math.cos(beta) * r
+
+    # SECTION 6
+    int_q6 = 0
+    for i in range(1, n + 1):
+        int_q6 += (q(6, (-math.pi / 2) + i * (math.pi / (2 * n)), n) * ((math.pi * r) / (2 * n)))
+    m6 = int_q6 * r
+
+    # FINAL COMPUTATION
+    xi = -(m1 + m3 + m4 + m6)
+    return xi

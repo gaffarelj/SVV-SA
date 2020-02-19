@@ -12,6 +12,7 @@ Inputs are below, as given in Aircraft Data, coded for CRJ700.
 def get_geometry(Nstiffeners=13, Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025,
                 hstiff=0.014, tstiff=0.0012, wstiff=0.018, beta=math.atan(8.65/39.75)):
     boomcoords = get_boomcoords()
+    boomcoords_hinge = boomcoords
     # stiffener area (in meters^2)
     stiff_area = (hstiff + wstiff) * tstiff     # small angle approximation is used
     # enclosed area (in meters^2)
@@ -20,7 +21,7 @@ def get_geometry(Nstiffeners=13, Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025,
     # moments of inertia (Iyy and Izz about the centroid, in meters^4)
     Iyy = comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area)
     Izz = comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area)
-    return Am, z_centroid, Iyy, Izz, tskin, boomcoords
+    return Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge
 
 def get_boomcoords():
     # stiffener positions (origin at hinge line, from bottom right going clockwise, in meters)

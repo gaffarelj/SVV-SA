@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
+def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None, do_plot=True):
 	"""
 	Get the aerodynamic load.
 	Inputs:
@@ -31,19 +31,15 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None):
 		data.append(row_d)							# Save the data of the row
 	if n_span is not None:							# If n_span had been specified for interpolation...
 		interp_data = []
-		i = 0
 		for column in zip(*data):					# Go through every column
 			column = np.array(column)
 			x, z, load = column[:,0], column[:,1], column[:,2]	# Extract data from the column
-			try:
-				# Apply linear interpolation on the column
-				column_interp = interp(column.tolist(), n_span, N_z, l_a, z[0], "z")
-				interp_data.append(column_interp)	# Save the interpolated data
-			except IndexError:						# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
-				pass
-			i += 1
+			# Apply linear interpolation on the column
+			column_interp = interp(column.tolist(), n_span, N_z, l_a, z[0], "z")
+			interp_data.append(column_interp)	# Save the interpolated data
 		data = list(zip(*interp_data))
-	plot_data(data)									# Plot all data in 3D
+	if do_plot:
+		plot_data(data)							# Plot all data in 3D
 	return data
 
 def plot_data(data):

@@ -21,7 +21,7 @@ def get_geometry(Nstiffeners=13, Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025,
     # moments of inertia (Iyy and Izz about the centroid, in meters^4)
     Iyy = comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area)
     Izz = comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area)
-    return Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge
+    return Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge, stiff_area
 
 def get_boomcoords():
     # stiffener positions (origin at hinge line, from bottom right going clockwise, in meters)

@@ -91,6 +91,7 @@ data = np.zeros((np.size(elements),5))
 #nested loop finds the averages (integration points) of all elements and stores them in data array
 # at the first 3 positions, the last 2 positions are reserved for the average stress and shear stress from
 # top to bottom
+#np.shape(elements
 
 for j in range(np.shape(elements)[0]):
 
@@ -114,10 +115,38 @@ for j in range(np.shape(elements)[0]):
 
 
 
-data = data.transpose()
+#data = data.transpose()
 
 
-scatter3d(data[0],data[1],data[2],data[3])
+#scatter3d(data[0],data[1],data[2],data[3])
+
+# usual number of nodes per section = 62
+next_section = np.unique(data[:,0])
+section_data = np.zeros((62,3))
+
+# select a cross section place to monitor the stresses
+numb = 55
+
+# first check for section completeness (62 points)
+i = 0
+for j in range(np.shape(data)[0]):
+    if data[j,0] == next_section[numb]:
+        i += 1
+# if section complete --> get out data for particular layer from the data array
+if i == 62:
+    k = 0
+    for j in range(np.shape(data)[0]):
+        if data[j,0] == next_section[numb]:
+            section_data[k,0] = data[j,1]
+            section_data[k,1] = data[j,2]
+            section_data[k,2] = data[j,3]
+            k += 1
+
+section_data =section_data.transpose()
+
+plt.scatter(section_data[1],section_data[0],c=section_data[2])
+plt.colorbar()
+plt.show()
 
 '''
 elementarray = []

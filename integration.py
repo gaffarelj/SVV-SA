@@ -1,17 +1,7 @@
-import numpy as np
-
-
-def integrate(f, a, b, threshold=1e-6):
-	# TO CHANGE
-	n = 1e4
-	xs = np.arange(a, b, 1/n)
-	y = [f(x) for x in xs]
-	return np.trapz(y, xs)
-	# TO CHANGE
-	
-def integrate_b(f, a, b, threshold=1e-6):
-	pass
-	
-integ = integrate(np.sin, 0, np.pi/2)
-integ_b = integrate_b(np.sin, 0, np.pi/2)
-print(integ, integ_b)
+def integrate(f, a, b, dx=1e-5):
+	n = int((b - a) / dx)
+	area = 0
+	for i in range(1, n):
+		x = a + i * dx
+		area += f(x)
+	return dx * (area + (f(a) + f(b)) / 2)

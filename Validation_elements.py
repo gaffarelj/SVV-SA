@@ -63,7 +63,7 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'Bending_result_notext_nosmallvalues_dat.csv'
+path = 'data/Jamstraight_result_notext_nosmallvalues_dat2.csv'
 file = open(path, "r")
 data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
@@ -100,13 +100,13 @@ for j in range(np.shape(elements)[0]):
         summationy += nodes[int(currentcoords[i])-1,2]
         summationz += nodes[int(currentcoords[i])-1,3]
 
+
     data[j,0] = summationx/4
     data[j,1] = summationy/4
     data[j,2] = summationz/4
     # add the von misses & shear stresses to the data_frame
     data[j, 3] = (data_frame[j, 2] + data_frame[j, 3]) / 2
     data[j, 4] = (data_frame[j, 4] + data_frame[j, 5]) / 2
-
 
 
 #data = data.transpose()
@@ -140,7 +140,11 @@ print(np.shape(incomplete))
 section_data = np.zeros((62,3))
 
 # select a cross section place to monitor the stresses
-numb = 55
+#print(next_section)
+numb = 40
+
+#print(next_section[0:40])
+# spacing of complete 24.6856995‬mm
 
 
 # first check for section completeness (62 points)

@@ -63,7 +63,7 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Bending_result_notext_dat.csv'
+path = 'Bending_result_notext_nosmallvalues_dat.csv'
 file = open(path, "r")
 data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
@@ -116,17 +116,39 @@ for j in range(np.shape(elements)[0]):
 
 # usual number of nodes per section = 62
 next_section = np.unique(data[:,0])
+
+'''
+# 3d plot the sections that are incomplete --> to check what is their physical
+incomplete = []
+
+for k in range(np.shape(next_section)[0]):
+    i = 0
+    current_section = []
+    for j in range(np.shape(data)[0]):
+        if data[j, 0] == next_section[k]:
+            i += 1
+            current_section.append(data[j,:])
+    if i != 62:
+        incomplete.append(current_section)
+
+incomplete = np.concatenate(incomplete,axis=0)
+
+print(np.shape(incomplete))
+
+'''
+
 section_data = np.zeros((62,3))
 
 # select a cross section place to monitor the stresses
 numb = 55
+
 
 # first check for section completeness (62 points)
 i = 0
 for j in range(np.shape(data)[0]):
     if data[j,0] == next_section[numb]:
         i += 1
-    print(i)
+
 # if section complete --> get out data for particular layer from the data array
 if i == 62:
     k = 0
@@ -136,6 +158,7 @@ if i == 62:
             section_data[k,1] = data[j,2]
             section_data[k,2] = data[j,3]
             k += 1
+
 
 section_data =section_data.transpose()
 

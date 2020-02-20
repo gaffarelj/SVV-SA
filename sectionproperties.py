@@ -26,19 +26,19 @@ def get_geometry(Nstiffeners=13, Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025,
 def get_boomcoords():
     # stiffener positions (origin at hinge line, from bottom right going clockwise, in meters)
     # [z, y]
-    zy1 = [-0.35671025, -0.00887626]
-    zy2 = [-0.27513076, -0.02662878]
-    zy3 = [-0.19355126, -0.0443813]
-    zy4 = [-0.11197177, -0.06213382]
-    zy5 = [-0.03039227, -0.07988634]
-    zy6 = [0.04924123, -0.07111646]
+    zy1 = [-0.35671, -0.00888]
+    zy2 = [-0.27513, -0.02663]
+    zy3 = [-0.19355, -0.04438]
+    zy4 = [-0.11197, -0.06213]
+    zy5 = [-0.03039, -0.07989]
+    zy6 = [0.04924, -0.07112]
     zy7 = [0.0865, 0]
-    zy8 = [0.04924123, 0.07111646]
-    zy9 = [-0.03039227, 0.07988634]
-    zy10 = [-0.11197177, 0.06213382]
-    zy11 = [-0.19355126, 0.0443813]
-    zy12 = [-0.27513076, 0.02662878]
-    zy13 = [-0.35671025, 0.00887626]
+    zy8 = [0.04924, 0.07112]
+    zy9 = [-0.03039, 0.07989]
+    zy10 = [-0.11197, 0.06213]
+    zy11 = [-0.19355, 0.0444]
+    zy12 = [-0.27513, 0.02663]
+    zy13 = [-0.35671, 0.00888]
     return np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13])
 
 def comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area):
@@ -68,11 +68,16 @@ def comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area):
 
 def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
     # Izz
-    Izz_thin = ((tskin * 0.4068 ** 3 * (math.sin(beta)) ** 2) / 12) + tskin * 0.4068 * (0.19875 * math.sin(beta)) ** 2
-    Izz_spar = (tspar * (Ha ** 3)) / 12
-    Izz_ring = ((Ha / 2) ** 3 * tskin * math.pi) / 2
+    Izz_thin = ((tskin * (0.4068 ** 3) * ((math.sin(beta)) ** 2)) / 12) + tskin * 0.4068 * (0.19875 * math.sin(beta)) ** 2
+    Izz_spar = (tspar * (Ha ** 3)) / 12 # This is correct
+    Izz_ring = ((Ha / 2) ** 3 * tskin * math.pi) / 2    # This is correct
+    print(Izz_thin, Izz_spar, Izz_ring)
     Izz_booms = 0
     for i in range(len(boomcoords)):
         Izz_booms += (boomcoords[i, 1]) ** 2 * stiff_area
     Izz_total = 2 * Izz_thin + Izz_spar + Izz_ring + Izz_booms
     return Izz_total
+
+Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge, stiff_area = get_geometry()
+#print(Am, z_centroid, Iyy, Izz, tskin, stiff_area, boomcoords, "\n\n", boomcoords_hinge, stiff_area)
+print(Izz)

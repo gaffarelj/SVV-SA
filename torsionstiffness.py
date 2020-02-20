@@ -1,5 +1,7 @@
 import math
-from sectionproperties import tskin,tspar,Ha
+from sectionproperties import tskin, tspar, Ha
+from shearcentre import q
+
 def spacinggenerator(distance, ha):
 	"""
 	Return the list of length of 5 parts in left cell
@@ -11,6 +13,11 @@ def spacinggenerator(distance, ha):
 	result = [distance, skin_spar, ha, skin_spar, distance]
 	print(result)
 	return result
+
+# def shearflowgenerator():
+# 	result = []
+# 	q1_bnb = q(1,s,n)
+# 	q2_ab = q(1,s,n)
 
 def roundintergration(sf_ab, sf_bnb, distance, thickness):
 	"""

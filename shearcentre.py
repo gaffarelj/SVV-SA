@@ -136,16 +136,18 @@ def qs(n):
     qb_intII = int_qb2II + int_qb3 + int_qb4 - int_qb5II
 
     # SYSTEM SOLVING
-    eqs = np.array([[((2 * r) / tspar) + ((2 * r * math.pi) / tskin), (-(2 * r) / tspar)],
-                    [(-(2 * r) / tspar), ((2 * r) / tspar) + (2 * l_topskin)]])
+    eqs = np.array([
+        [(math.pi * r) / tskin + r / tspar, -r / tspar],
+        [-2 * r / tspar, (2 * r / tspar) + (2 * l_topskin / tskin)]
+    ])
     cs = np.array([-qb_intI, -qb_intII])
     qsI, qsII = np.linalg.solve(eqs, cs)
     return qsI, qsII
 
-
+n = 1000
+qsI, qsII = qs(n)
 # MASTER FUNCTION
 def q(section, s, n):
-    qsI, qsII = qs(n)
     if section == 1:
         q = qb_1(s) + qsI
     elif section == 2:
@@ -191,3 +193,5 @@ def shear_centre(n):
     # FINAL COMPUTATION
     xi = -(m1 + m3 + m4 + m6)
     return xi
+
+print(shear_centre(1000))

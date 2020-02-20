@@ -21,7 +21,6 @@ def opentext(filename):
     text = document.read()
     document.close()
     return text
-
 def cut_text(text, cutsym):
     listperline = text.split(cutsym)
     arrayperline = np.array(listperline)
@@ -31,8 +30,6 @@ def plotxyz(array):
 text1 = opentext('data/nodes')
 nodeline = cut_text(text1, '\n')
 nodeline0 = nodeline[0]
-
-
 allnodes = []
 for i in range(len(nodeline)):
     nodeline[i] = ''.join(nodeline[i].split())
@@ -40,7 +37,6 @@ for i in range(len(nodeline)):
     for i in range(len(nodelist)):
         nodelist[i] = float(nodelist[i])
     allnodes.append(nodelist)
-
 text1 = opentext('data/elements')
 nodeline = cut_text(text1, '\n')
 nodeline0 = nodeline[0]
@@ -51,9 +47,7 @@ for i in range(len(nodeline)):
     for i in range(len(nodelist)):
         nodelist[i] = float(nodelist[i])
     allelements.append(nodelist)
-
 map(float, allelements)
-
 #print('allnodes', allnodes)
 #print('allelements', allelements)
 '''
@@ -69,9 +63,9 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Bending_result_dat.csv'
+path = 'Bending_result_notext_nosmallvalues_dat.csv'
 file = open(path, "r")
-data_frame = np.genfromtxt(path, delimiter=",", skip_header=15)
+data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
 
 # define a collecting array for all result data
@@ -122,16 +116,39 @@ for j in range(np.shape(elements)[0]):
 
 # usual number of nodes per section = 62
 next_section = np.unique(data[:,0])
+
+'''
+# 3d plot the sections that are incomplete --> to check what is their physical
+incomplete = []
+
+for k in range(np.shape(next_section)[0]):
+    i = 0
+    current_section = []
+    for j in range(np.shape(data)[0]):
+        if data[j, 0] == next_section[k]:
+            i += 1
+            current_section.append(data[j,:])
+    if i != 62:
+        incomplete.append(current_section)
+
+incomplete = np.concatenate(incomplete,axis=0)
+
+print(np.shape(incomplete))
+
+'''
+
 section_data = np.zeros((62,3))
 
 # select a cross section place to monitor the stresses
 numb = 55
+
 
 # first check for section completeness (62 points)
 i = 0
 for j in range(np.shape(data)[0]):
     if data[j,0] == next_section[numb]:
         i += 1
+
 # if section complete --> get out data for particular layer from the data array
 if i == 62:
     k = 0
@@ -141,6 +158,7 @@ if i == 62:
             section_data[k,1] = data[j,2]
             section_data[k,2] = data[j,3]
             k += 1
+
 
 section_data =section_data.transpose()
 
@@ -153,7 +171,6 @@ elementarray = []
 print(len(allelements))
 for i in range(len(allelements)):
     print('elementnumber', i)
-
     # first node: find in the elementlist the right index and find its corresponding nodes.
     print('1', allnodes[int(allelements[i][1]) - 1])
     # second node
@@ -162,13 +179,10 @@ for i in range(len(allelements)):
     print('3', allnodes[int(allelements[i][3]) - 1])
     # fourth node
     print('4', allnodes[int(allelements[i][4]) - 1])
-
     # find values for element
     elementlist = [allnodes[int(allelements[i][1]) - 1], allnodes[int(allelements[i][2]) - 1],
                    allnodes[int(allelements[i][3]) - 1], allnodes[int(allelements[i][4]) - 1]]
     print(elementlist)
     elementarray.append(elementlist)
 # print (elementarray)
-
-
 '''

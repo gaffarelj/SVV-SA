@@ -149,22 +149,26 @@ def shear_centre(n):
     def q1(theta):
         q = qb_1(theta) + qsI
         return q
+
     def q2(s):
         q = qb_2(s) - qsI + qsII
         return q
+
     def q3(s):
         q = qb_3(s) + qsII
         return q
+
     def q4(s):
         q = qb_4(s) + qsII
         return q
+
     def q5(s):
         q = qb_5(s) + qsI - qsII
         return q
+
     def q6(theta):
         q = qb_6(theta) + qsI
         return q
-
 
     # MOMENT CONTRIBUTION
     # SECTION 1
@@ -196,7 +200,7 @@ def shear_centre(n):
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(10000)
 
-#print('Shear centre is (defined from the hinge line)', xi, '[m] to the right')
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 
+# print('Shear centre is (defined from the hinge line)', xi, '[m] to the right')

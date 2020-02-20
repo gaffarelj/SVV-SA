@@ -63,9 +63,9 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Bending_result_dat.csv'
+path = 'data/Bending_result_notext_dat.csv'
 file = open(path, "r")
-data_frame = np.genfromtxt(path, delimiter=",", skip_header=15)
+data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
 
 # define a collecting array for all result data
@@ -126,6 +126,7 @@ i = 0
 for j in range(np.shape(data)[0]):
     if data[j,0] == next_section[numb]:
         i += 1
+    print(i)
 # if section complete --> get out data for particular layer from the data array
 if i == 62:
     k = 0

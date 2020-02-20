@@ -143,8 +143,8 @@ def shear_centre(n):
     ])
     cs = np.array([-qb_intI, -qb_intII])
     qsI, qsII = np.linalg.solve(eqs, cs)
-    print('Redundant shear flow in cell I is', qsI, '[N/m]')
-    print('Redundant shear flow in cell II is', qsII, '[N/m]')
+    print('Redundant shear flow in cell I is', qsI, '[N/m], clockwise positive')
+    print('Redundant shear flow in cell II is', qsII, '[N/m], clockwise positive')
 
     def q1(theta):
         q = qb_1(theta) + qsI

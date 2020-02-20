@@ -86,30 +86,31 @@ def qb_6(theta):  # -pi/2 to 0
     return qb
 
 
-# REDUNDANT SHEAR
+# SHEAR CENTRE
+def shear_centre(n):
+    # REDUNDANT SHEAR
 
-def qs(n):
     # CELL I
     # SECTION 1 - base
     int_qb1 = 0
     for i in range(1, n + 1):
         int_qb1 += (qb_1(i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n))) / tskin
-    print('Finished qs section 1, int_qb1 = ', int_qb1)
+
     # SECTION 2 - base (cell I)
     int_qb2I = 0
     for i in range(1, n + 1):
         int_qb2I += (qb_2(r - i * (r / n)) * (r / n)) / tspar
-    print('Finished qs section 2, cell I, int_qb2I = ', int_qb2I)
+
     # SECTION 5 - base (cell I)
     int_qb5I = 0
     for i in range(1, n + 1):
         int_qb5I += (qb_5(i * (r / n)) * (r / n)) / tspar
-    print('Finished qs section 5, cell I, int_qb5I = ', int_qb5I)
+
     # SECTION 6 - base
     int_qb6 = 0
     for i in range(1, n + 1):
         int_qb6 += (qb_6((-math.pi / 2) + i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n))) / tskin
-    print('Finished qs section 8, int_qb6 = ', int_qb6)
+    print('Done computing cell I contribution.')
     qb_intI = int_qb1 - int_qb2I + int_qb5I + int_qb6
 
     # CELL II
@@ -132,7 +133,7 @@ def qs(n):
     int_qb5II = 0
     for i in range(1, n + 1):
         int_qb5II += (qb_5(r - i * (r / n)) * (r / n)) / tspar
-
+    print('Done computing cell II contribution.')
     qb_intII = int_qb2II + int_qb3 + int_qb4 - int_qb5II
 
     # SYSTEM SOLVING
@@ -142,56 +143,60 @@ def qs(n):
     ])
     cs = np.array([-qb_intI, -qb_intII])
     qsI, qsII = np.linalg.solve(eqs, cs)
-    return qsI, qsII
+    print('Redundant shear flow in cell I is', qsI, '[N/m]')
+    print('Redundant shear flow in cell II is', qsII, '[N/m]')
 
-n = 1000
-qsI, qsII = qs(n)
-# MASTER FUNCTION
-def q(section, s, n):
-    if section == 1:
-        q = qb_1(s) + qsI
-    elif section == 2:
+    def q1(theta):
+        q = qb_1(theta) + qsI
+        return q
+    def q2(s):
         q = qb_2(s) - qsI + qsII
-    elif section == 3:
+        return q
+    def q3(s):
         q = qb_3(s) + qsII
-    elif section == 4:
+        return q
+    def q4(s):
         q = qb_4(s) + qsII
-    elif section == 5:
+        return q
+    def q5(s):
         q = qb_5(s) + qsI - qsII
-    elif section == 6:
-        q = qb_6(s) + qsI
-    else:
-        print("Not a valid section")
-    return q
+        return q
+    def q6(theta):
+        q = qb_6(theta) + qsI
+        return q
 
-# SHEAR CENTRE
-def shear_centre(n):
+
+    # MOMENT CONTRIBUTION
     # SECTION 1
     int_q1 = 0
     for i in range(1, n + 1):
-        int_q1 += (q(1, i * (math.pi / (2 * n)), n) * ((math.pi * r) / (2 * n)))
+        int_q1 += (q1(i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n)))
     m1 = int_q1 * r
 
     # SECTION 3
     int_q3 = 0
     for i in range(1, n + 1):
-        int_q3 = (q(3, i * (l_topskin / n), n) * (l_topskin / n))
+        int_q3 = (q3(i * (l_topskin / n)) * (l_topskin / n))
     m3 = int_q3 * math.cos(beta) * r
 
     # SECTION 4
     int_q4 = 0
     for i in range(1, n + 1):
-        int_q4 = (q(4, i * (l_topskin / n), n) * (l_topskin / n))
+        int_q4 = (q4(i * (l_topskin / n)) * (l_topskin / n))
     m4 = int_q4 * math.cos(beta) * r
 
     # SECTION 6
     int_q6 = 0
     for i in range(1, n + 1):
-        int_q6 += (q(6, (-math.pi / 2) + i * (math.pi / (2 * n)), n) * ((math.pi * r) / (2 * n)))
+        int_q6 += (q6((-math.pi / 2) + i * (math.pi / (2 * n))) * ((math.pi * r) / (2 * n)))
     m6 = int_q6 * r
 
     # FINAL COMPUTATION
     xi = -(m1 + m3 + m4 + m6)
-    return xi
 
-print(shear_centre(1000))
+    return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
+
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(10000)
+
+#print('Shear centre is (defined from the hinge line)', xi, '[m] to the right')
+

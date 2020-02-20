@@ -71,13 +71,8 @@ def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
     Izz_thin = ((tskin * (0.4068 ** 3) * ((math.sin(beta)) ** 2)) / 12) + tskin * 0.4068 * (0.19875 * math.sin(beta)) ** 2
     Izz_spar = (tspar * (Ha ** 3)) / 12 # This is correct
     Izz_ring = ((Ha / 2) ** 3 * tskin * math.pi) / 2    # This is correct
-    print(Izz_thin, Izz_spar, Izz_ring)
     Izz_booms = 0
     for i in range(len(boomcoords)):
         Izz_booms += (boomcoords[i, 1]) ** 2 * stiff_area
     Izz_total = 2 * Izz_thin + Izz_spar + Izz_ring + Izz_booms
     return Izz_total
-
-Am, z_centroid, Iyy, Izz, tskin, boomcoords, boomcoords_hinge, stiff_area = get_geometry()
-#print(Am, z_centroid, Iyy, Izz, tskin, stiff_area, boomcoords, "\n\n", boomcoords_hinge, stiff_area)
-print(Izz)

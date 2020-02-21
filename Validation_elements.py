@@ -52,7 +52,7 @@ map(float, allelements)
 #print('allelements', allelements)
 '''
 # starting to couple every element with 4 points.
-
+######################################## loading data ##########################################
 path = 'data/nodes.txt'
 file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )
@@ -86,7 +86,7 @@ data = np.zeros((np.size(elements),5))
 # at the first 3 positions, the last 2 positions are reserved for the average stress and shear stress from
 # top to bottom
 #np.shape(elements
-
+############################# Making data frame ##############################################
 for j in range(np.shape(elements)[0]):
 
     currentcoords = elements[j,1:]
@@ -108,12 +108,17 @@ for j in range(np.shape(elements)[0]):
     data[j, 3] = (data_frame[j, 2] + data_frame[j, 3]) / 2
     data[j, 4] = (data_frame[j, 4] + data_frame[j, 5]) / 2
 
+######################################### Plotting in 4D #####################################
+
 
 #data = data.transpose()
 
 
 #scatter3d(data[0],data[1],data[2],data[4])
 
+
+
+##################################### plotting  slices with unknown spacing ####################
 # usual number of nodes per section = 62
 next_section = np.unique(data[:,0])
 
@@ -183,9 +188,6 @@ if i != 62:
             k += 1
 
 
-
-
-
 for j in range(np.shape(data)[0]):
     if data[j,0] >= xloc[loc_int] - 0.2*step and data[j,0] <= xloc[loc_int] + 0.2*step:
         section_data[k,0] = data[j,1]
@@ -193,24 +195,16 @@ for j in range(np.shape(data)[0]):
         section_data[k,2] = data[j,3]
         k += 1
 
-
-
-
 section_data =section_data.transpose()
 
 plt.scatter(section_data[1],section_data[0],c=section_data[2])
 plt.colorbar()
-#plt.show()
+plt.show()
 
-
-
-
-
-
-
-
+############################################# working code to plot slicewise but with guesswork for spacing #########
 
 '''
+
 # untouched code to show layers, still manual
 
 section_data = np.zeros((62,3))

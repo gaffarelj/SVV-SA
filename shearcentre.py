@@ -138,7 +138,7 @@ def shear_centre(n):
 
     # SYSTEM SOLVING
     eqs = np.array([
-        [(math.pi * r) / tskin + r / tspar, -r / tspar],
+        [(math.pi * r) / tskin + r / tspar, (-2 * r) / tspar],
         [-2 * r / tspar, (2 * r / tspar) + (2 * l_topskin / tskin)]
     ])
     cs = np.array([-qb_intI, -qb_intII])
@@ -202,5 +202,3 @@ def shear_centre(n):
 
 
 qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
-
-# print('Shear centre is (defined from the hinge line)', xi, '[m] to the right')

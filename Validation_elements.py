@@ -195,6 +195,7 @@ for j in range(np.shape(data)[0]):
 
 
 
+
 section_data =section_data.transpose()
 
 plt.scatter(section_data[1],section_data[0],c=section_data[2])

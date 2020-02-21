@@ -112,7 +112,7 @@ for j in range(np.shape(elements)[0]):
 #data = data.transpose()
 
 
-#scatter3d(data[0],data[1],data[2],data[3])
+#scatter3d(data[0],data[1],data[2],data[4])
 
 # usual number of nodes per section = 62
 next_section = np.unique(data[:,0])
@@ -136,6 +136,81 @@ incomplete = np.concatenate(incomplete,axis=0)
 print(np.shape(incomplete))
 
 '''
+
+section_data = np.zeros((62,3))
+
+
+# select a cross section place to monitor the stresses
+#print(next_section)
+numb = 1
+
+# define starting point of complete section
+i = 0
+found = False
+k = 0
+while found == False:
+    i = 0
+    for j in range(np.shape(data)[0]):
+        if data[j,0] == next_section[k]:
+            i += 1
+    k += 1
+    if i == 62:
+        found = True
+
+start_int = k-1
+
+
+# find the discepancies between next_section
+
+dummy = np.zeros(np.shape(next_section))
+dummy[1:] = next_section[0:-1]
+
+spacing = next_section-dummy
+
+#print(next_section[start_int]+spacing[start_int+1])
+#print(next_section[start_int], next_section[start_int+1])
+
+i = 0
+for j in range(np.shape(data)[0]):
+    if data[j,0] == next_section[numb]:
+        i += 1
+
+# if section complete --> get out data for particular layer from the data array
+if i != 62:
+    for j in range(np.shape(data)[0]):
+        if data[j,0] == next_section[numb]:
+            data[j,:] = 0
+            k += 1
+
+
+
+
+
+for j in range(np.shape(data)[0]):
+    if data[j,0] >= xloc[loc_int] - 0.2*step and data[j,0] <= xloc[loc_int] + 0.2*step:
+        section_data[k,0] = data[j,1]
+        section_data[k,1] = data[j,2]
+        section_data[k,2] = data[j,3]
+        k += 1
+
+
+
+section_data =section_data.transpose()
+
+plt.scatter(section_data[1],section_data[0],c=section_data[2])
+plt.colorbar()
+#plt.show()
+
+
+
+
+
+
+
+
+
+'''
+# untouched code to show layers, still manual
 
 section_data = np.zeros((62,3))
 
@@ -169,24 +244,4 @@ section_data =section_data.transpose()
 plt.scatter(section_data[1],section_data[0],c=section_data[2])
 plt.colorbar()
 plt.show()
-
-'''
-elementarray = []
-print(len(allelements))
-for i in range(len(allelements)):
-    print('elementnumber', i)
-    # first node: find in the elementlist the right index and find its corresponding nodes.
-    print('1', allnodes[int(allelements[i][1]) - 1])
-    # second node
-    print('2', allnodes[int(allelements[i][2]) - 1])
-    # third node
-    print('3', allnodes[int(allelements[i][3]) - 1])
-    # fourth node
-    print('4', allnodes[int(allelements[i][4]) - 1])
-    # find values for element
-    elementlist = [allnodes[int(allelements[i][1]) - 1], allnodes[int(allelements[i][2]) - 1],
-                   allnodes[int(allelements[i][3]) - 1], allnodes[int(allelements[i][4]) - 1]]
-    print(elementlist)
-    elementarray.append(elementlist)
-# print (elementarray)
 '''

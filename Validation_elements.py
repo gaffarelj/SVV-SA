@@ -94,7 +94,6 @@ for numb in range(np.shape(next_section)[0]):
     #print(next_section[0:40])
     # spacing of complete 24.6856995‬mm
 
-
     # first check for section completeness (62 points)
     i = 0
     for j in range(np.shape(data)[0]):

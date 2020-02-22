@@ -140,4 +140,20 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 
+
 #get_load(n_chord=75, n_span=150)
+
+q_load = get_load(n_chord=75, n_span=150)
+#load:
+"""
+[
+	[x1, z1, load],
+	[x1, z2, load],
+	...,
+	[x1, z70, load],
+	[x2, z1, load],
+	[x2, z2, load],
+	...
+]
+"""
+print(q_load)

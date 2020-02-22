@@ -106,7 +106,7 @@ for numb in range(np.shape(next_section)[0]):
 
         section_data =section_data.transpose()
 
-        #print(next_section[numb])
+
         #plt.scatter(section_data[1],section_data[0],c=section_data[2])
         #plt.colorbar()
         #plt.show()

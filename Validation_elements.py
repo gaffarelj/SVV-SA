@@ -31,6 +31,15 @@ file = open(path, "r")
 data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
 
+path = 'data/Displ_jamstraight.csv'
+file = open(path, "r")
+displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
+file.close()
+
+# optional --> add displacement to all nodes
+
+nodes[:,1:] = nodes[:,1:] + displ_dat[:,2:]
+
 # define a collecting array for all result data
 data = np.zeros((np.size(elements),5))
 
@@ -64,14 +73,14 @@ for j in range(np.shape(elements)[0]):
 ######################################### Plotting in 4D #####################################
 
 
-#data = data.transpose()
+data = data.transpose()
 
 
-#scatter3d(data[0],data[1],data[2],data[4])
+scatter3d(data[0],data[1],data[2],data[4])
 
 
 ##################################### plotting  slices with unknown spacing ####################
-
+'''
 next_section = np.unique(data[:,0])
 
 # select a cross section place to monitor the stresses
@@ -129,9 +138,9 @@ for numb in range(np.shape(next_section)[0]):
 # plot list of error
 
 plt.plot(xloc,discr_miss,xloc,discr_shear)
-plt.show()
+#plt.show()
 
-
+'''
 
 
 

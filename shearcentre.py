@@ -122,12 +122,12 @@ def shear_centre(n):
     # SECTION 3 - base
     int_qb3 = 0
     for i in range(1, n + 1):
-        int_qb3 = (qb_3(i * (l_topskin / n)) * (l_topskin / n)) / tskin
+        int_qb3 += (qb_3(i * (l_topskin / n)) * (l_topskin / n)) / tskin
 
     # SECTION 4 - base
     int_qb4 = 0
     for i in range(1, n + 1):
-        int_qb4 = (qb_4(i * (l_topskin / n)) * (l_topskin / n)) / tskin
+        int_qb4 += (qb_4(i * (l_topskin / n)) * (l_topskin / n)) / tskin
 
     # SECTION 5 - base (cell II)
     int_qb5II = 0
@@ -180,13 +180,13 @@ def shear_centre(n):
     # SECTION 3
     int_q3 = 0
     for i in range(1, n + 1):
-        int_q3 = (q3(i * (l_topskin / n)) * (l_topskin / n))
+        int_q3 += (q3(i * (l_topskin / n)) * (l_topskin / n))
     m3 = int_q3 * math.cos(beta) * r
 
     # SECTION 4
     int_q4 = 0
     for i in range(1, n + 1):
-        int_q4 = (q4(i * (l_topskin / n)) * (l_topskin / n))
+        int_q4 += (q4(i * (l_topskin / n)) * (l_topskin / n))
     m4 = int_q4 * math.cos(beta) * r
 
     # SECTION 6
@@ -196,9 +196,10 @@ def shear_centre(n):
     m6 = int_q6 * r
 
     # FINAL COMPUTATION
-    xi = -(m1 + m3 + m4 + m6)
+    xi = (m1 + m3 + m4 + m6)
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
+#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 
-qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+#print(xi)

@@ -178,7 +178,7 @@ def shear_centre(n):
     m6 = int_q6 * sect.r
 
     # FINAL COMPUTATION
-    xi = -(m1 + m3 + m4 + m6)
+    xi = (m1 + m3 + m4 + m6)
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 

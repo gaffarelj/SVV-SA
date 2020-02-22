@@ -15,43 +15,90 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None, do_plot=True):
 	"""
 	f = open("data/aerodynamicloadcrj700.dat").readlines()	# Open the aerodynamic load
 	data = []
-	for i, row in enumerate(f):						# Go trough all rows (span-wise)
-		row_d = []									# List to contain data from the row
-		N_z, N_x = len(f), len(row.split(","))		# The number of z/x coordinates = number of rows/columns
-		if n_chord is None:							# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
-			n_chord = N_x
-		z = comp_coord(i, N_z, l_a, "z")			# Compute the z coordinate
-		for j, point in enumerate(row.split(",")):	# Go trough all columns of the row
-			x = comp_coord(j, N_x, C_a, "x")		# Compute the x coordinate
-			load = 1000 * float(point)				# Convert the string load to a float, in [N] instead of [kN]
-			row_d.append([x, z, load])				# Save the x, z coord. and the load to a temp list
-		if n_chord is not None:						# If n_chord had been specified for interpolation...
-			# ...interpolate new loads along the x-axis (chord-wise)
-			row_d = interp(row_d, n_chord, N_x, C_a, z, "x")
-		data.append(row_d)							# Save the data of the row
-	if n_span is not None:							# If n_span had been specified for interpolation...
-		interp_data = []
-		for column in zip(*data):					# Go through every column
-			column = np.array(column)
-			x, z, load = column[:,0], column[:,1], column[:,2]	# Extract data from the column
-			# Apply linear interpolation on the column
-			column_interp = interp(column.tolist(), n_span, N_z, l_a, z[0], "z")
-			interp_data.append(column_interp)	# Save the interpolated data
-		data = list(zip(*interp_data))
-	if do_plot:
-		plot_data(data)							# Plot all data in 3D
-	return data
+	N_z, N_x = len(f), len(f[0].split(","))			# The number of z/x coordinates = number of rows/columns
 
-def plot_data(data):
+	for i, row in enumerate(f):						# Go trough all rows (chord-wise)
+		z = comp_coord(i, N_z, C_a, "z")			# Compute z-coordinate base on row number
+		col = []
+		for j, point in enumerate(row.split(",")):	# Go trough every column
+			x = comp_coord(j, N_x, l_a, "x")		# Compute z-coordinate base on row number
+			load = 1000 * float(point)				# Extract the load at that point (in N)
+			col.append([z, x, load])				# Save the z and x coords + the load at that point
+		data.append(col)
+
+	# Flip the dataset to cut span-wise instead of chord-wise
+	span_x_coords = []	# Span-wise x coordinates
+	sections_data = []	# z, load per section
+	for span_section in zip(*data):	# Flip the dataset here, so go trough each column first
+		x = span_section[0][1]		# Extract the x coord. of the section
+		span_x_coords.append(x)		# Save the x coord. of the section
+		span_cut = []
+		for point in span_section:	# For each point on the chord (in this section)
+			z, load = point[0], point[2]	# Save the z-coordinate and load on the chord
+			span_cut.append([z, load])
+		sections_data.append([x, span_cut])	# Save the data as x-coord. : [z-coords:loads]
+	# Make sure to make the span-wise interpolation even if it not asked,
+	# because the chord-wise interp. is build within the span-wise one
+	if n_chord is not None and n_span is None:
+		n_span = N_x
+	interp_sections_data = []
+	interp_span_x_coords = interp_coords(span_x_coords, n_span, N_x, l_a, "x")	# Interpolate the x-coordinates on n new locations
+	point_a, point_b = span_x_coords[0], span_x_coords[1]						# Set the first points before and after the new inter. coord. 
+	last_coord_b = 1															# Save the index of the point b
+	for new_coord in interp_span_x_coords:										# Go through all interpolated coordinates
+		if new_coord > point_b and last_coord_b + 1 < len(span_x_coords):		# If the interpolated coord. is above point b...
+			point_a, point_b = point_b, span_x_coords[last_coord_b + 1]			# ...set point a as previous point b, and b as next
+			last_coord_b += 1													# Save the index of the new point b
+		span_cut = []
+		for i, chord_point in enumerate(sections_data[last_coord_b-1][1]):		# For each chord point of the section
+			z = chord_point[0]													# Get the z-coordinate on the chord
+			load = interp_two_points(new_coord, point_a, point_b, 
+				chord_point[1], sections_data[last_coord_b][1][i][1])			# Interpolate the load !SPAN-WISE!, on that chord point
+			span_cut.append([z, load])
+		if n_chord is not None:													# Also apply interpolation chord-wise...
+			interp_span_cut = []
+			z = list(zip(*span_cut))[0]											# Extract the z-coordinates of evey chord-point in this section
+			loads = list(zip(*span_cut))[1]										# Extract the load at evey chord-point in this section
+			interp_z_coords = interp_coords(z, n_chord, N_z, C_a, "z")			# Interpolate the z-coordinates on n new locations
+			point_c_a, point_c_b = z[0], z[1]									# Set the first points before and after the new inter. coord. 
+			last_coord_c_b = 1													# Save the index of the point b
+			for new_c_coord in interp_z_coords:									# Go trough all interpolated chord coordinates
+				if new_c_coord < point_c_b and last_coord_c_b + 1 < len(z):		# If the interpolated coord. is below point b...
+					point_c_a, point_c_b = point_c_b, z[last_coord_c_b + 1]		# ...set point a as previous point b, and b as next
+					last_coord_c_b += 1											# Save the index of the new point b
+				load_c = interp_two_points(new_c_coord, point_c_a, point_c_b, 	
+				   loads[last_coord_c_b-1], loads[last_coord_c_b])				# Interpolate the load CHORD-WISE 
+				interp_span_cut.append([new_c_coord, load_c])
+			span_cut = interp_span_cut											# Save the section loads
+		interp_sections_data.append([new_coord, span_cut])
+	span_x_coords, sections_data = interp_span_x_coords, interp_sections_data
+	# If specified, plot the load
+	if do_plot:
+		plot_data(sections_data)
+	# Return the span coordinates (the x coordinate at every cut)
+	# And the sections data, as follows:
+	#	[
+	#		[x1, [z1, load], [z2, load], [z3, load], ...],
+	#		[x2, [z1, load], [z2, load], ...],
+	#		...
+	#	]
+	return span_x_coords, sections_data
+
+def plot_data(sections):
 	"""
 	Plot the resulting data in 3D
 	"""
 	fig = plt.figure()
-	data = np.array(data) # Convert the list to a numpy array
 	# Extract the x, z, and load from the multidimensional data array
-	x, z, load = data[:,:,0].flatten(), data[:,:,1].flatten(), data[:,:,2].flatten()
+	x, z, loads = [], [], []
+	for section in sections:
+		x_section = section[0]
+		for chord_point in section[1]:
+			x.append(x_section)
+			z.append(chord_point[0])
+			loads.append(chord_point[1])
 	ax = fig.add_subplot(111, projection='3d')
-	ax.scatter(x, z, load, marker="x")
+	ax.scatter(x, z, loads, marker="x")
 	ax.set_xlabel('X (span) [m]')
 	ax.set_ylabel('Z (chord) [m]')
 	ax.set_zlabel('Load [N]')
@@ -78,35 +125,6 @@ def comp_coord(i, N, l, c_type):
 	f = -1 if c_type == "z" else 1
 	coord = f / 2 * (l / 2 * (1 - math.cos(theta)) + l / 2 * (1 - math.cos(theta_1)))
 	return coord
-
-def interp(data, n, N, l, other_coord, c_type):
-	"""
-	Interpolate the dataset to n new points
-	Inputs:
-		- data: given dataset, to be interpolated
-		- n: number of points to which to interpolate
-		- N: number of rows/columns in the existing dataset
-		- other_coord: coordinate list that won't be interpolated
-		- c_type: coordinate type/direction: "x" or "z"
-	"""
-	new_data = []
-	coordinates = np.array(data)[:,0].tolist()								# Extract the coordinate (to be interpolated) from the data
-	interp_coordinates = interp_coords(coordinates, n, N, l, c_type)		# Interpolate the existing coord. to n new coord.
-	point_a, point_b = coordinates[0], coordinates[1]						# Set the first point before and after the new inter. coord. 
-	last_coord_b = 1														# Save the index of the point b
-	for new_coord in interp_coordinates:									# Go through all interpolated coordinates
-		# If the interpolated coord. is above point b...
-		if (c_type == "x" and new_coord > point_b) or (c_type == "z" and new_coord < point_b) and last_coord_b + 1 < len(coordinates):
-			try:
-				point_a, point_b = point_b, coordinates[last_coord_b + 1]	# ...set point a as previous point b, and b as next
-				last_coord_b += 1											# Save the index of the new point b
-			except IndexError:												# THIS IS A TEMPORARY FIX, NOT IDEAL TO KEEP
-				pass
-		# Interpolate the load at the interp. coordinate, between the loads at points a and b
-		load = interp_two_points(new_coord, point_a, point_b, data[last_coord_b-1][2], data[last_coord_b][2])
-		# Save the load, new interp. coord., and unchanged coord. in the new data array
-		new_data.append([new_coord, other_coord, load]) if c_type == "z" else new_data.append([other_coord, new_coord, load])
-	return new_data
 
 def interp_coords(coordinates, n, N, l, c_type):
 	"""
@@ -140,20 +158,14 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 
-
-#get_load(n_chord=75, n_span=150)
-
-q_load = get_load(n_chord=75, n_span=150)
-#load:
-"""
-[
-	[x1, z1, load],
-	[x1, z2, load],
-	...,
-	[x1, z70, load],
-	[x2, z1, load],
-	[x2, z2, load],
-	...
-]
-"""
-print(q_load)
+section_coordinates, section_loads = get_load(n_chord=150, n_span=100, do_plot=True)
+# Get the span coordinates (the x coordinate at every cut)
+# And the sections data, as follows:
+#	[
+#		[x1, [z1, load], [z2, load], [z3, load], ...],
+#		[x2, [z1, load], [z2, load], ...],
+#		...
+#	]
+print(section_coordinates)
+print("\n", section_coordinates[10], "\n")
+print(section_loads[10])

@@ -5,7 +5,7 @@ def scatter3d(x,y,z, cs):
     fig = plt.figure()
     ax = Axes3D(fig)
     pl = ax.scatter(x, y, z, c=cs, cmap='coolwarm')
-    plt.colorbar(pl)
+    fig.colorbar(pl)
     plt.show()
 
 
@@ -21,7 +21,7 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Jamstraight_result_notext_nosmallvalues_dat2.csv'
+path = 'data/Bending_result_notext_dat.csv'
 file = open(path, "r")
 data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()

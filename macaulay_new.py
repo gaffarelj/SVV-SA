@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
 # qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 xi = -0.007513567161803937
-J = 0.000187829  # from verification model
+J = 8.629971582027014e-06  # from verification model
 G = 28e9
 E = 73.1e9
 
@@ -273,7 +273,7 @@ def Mz(x):
         M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
     if x > x3:
         M += Rz3 * (x - x3)
-    return -M
+    return M
 
 
 def T(x):
@@ -318,7 +318,7 @@ def Sy(x):
         F -= math.sin(theta) * P
     if x > x3:
         F += Ry3
-    return F
+    return -F
 
 
 def v(x):
@@ -353,7 +353,7 @@ def w(x):
     return v
 
 
-def alpha(x):
+def alpha(x): #Check!
     core = S(fd, 0, x)
     if x > x1:
         core += -xi * Ry1 * (x - x1)
@@ -367,13 +367,13 @@ def alpha(x):
         core -= -xi * Ry3 * (x - x3)
     alpha = -(1 / (G * J)) * core + C5
     angle = math.degrees(alpha)
-    return angle
+    return -alpha
 
 
 x = np.linspace(0.0, 1.691, 500)
 y = np.zeros((500, 1))
 for i in range(500):
-    y[i, 0] = Sz(x[i])
+    y[i, 0] = alpha(x[i])
 
 plt.plot(x, y)
 plt.show()

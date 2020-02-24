@@ -1,78 +1,52 @@
 import math
-from sectionproperties import tskin, tspar, Ha
-from shearcentre import q
+import numpy as np
 
-def spacinggenerator(distance, ha):
-	"""
-	Return the list of length of 5 parts in left cell
-	Input:
-	- distance: the distance calculated between evenly distributed booms
-	- ha: height of the aileron
-	"""
-	skin_spar = math.pi*ha/4 - distance # the tiny part on semi circle on the left to spar
-	result = [distance, skin_spar, ha, skin_spar, distance]
-	print(result)
-	return result
+import sectionproperties as SP
+import shearcentre as SC
 
-# def shearflowgenerator():
-# 	result = []
-# 	q1_bnb = q(1,s,n)
-# 	q2_ab = q(1,s,n)
+section_prop = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+# The following parameters can be used out of section_prop (example: print(section_prop.z_centroid)
+# Iyy, Izz, Am, z_centroid, stiff_area, boomcoords, boomcoords_hinge,
+# tskin, tspar, hstiff, tstiff, wstiff, Ha, Ca, r, l_topskin, beta, l_spar_to_end
+SC.set_sect(section_prop)
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
+print("shear center:", xi)
 
-def roundintergration(sf_ab, sf_bnb, distance, thickness):
-	"""
-	Round integration between booms
-	Inputs:
-	- sf_ab: shear flow after the boom
-	- sf_bnb: shear flow before next boom
-	"""
-	return (sf_ab+sf_bnb)*distance/2/thickness
+print(q1(0.03),"hello")
+print(q5(0.03))
 
-def torsionstiffness(T, shearflows, t_skin, t_spar, distance_between_booms, ha):
+def torsionstiffness():
 	"""
 	Calculate the torsional stiffness using shear flow in left cell
 	Formulas:
 	G*dtheta/dz = 1/2/A1 * f qds/t
 	J = T/(G*dtheta/dz)
-
-	Inputs:
-	- T: Torsion
-	- shearflows: shear_floe per section in left cell
-	- t_skin: skin thickness
-	- t_spar: spar thickness
-	- distance_between_booms: evenly distributed distance between booms
-	- ha: height of the aileron
 	"""
-	# 5 regions to calculate for left cell
-	spacing = spacinggenerator(distance_between_booms,ha)
+	# 4 regions to calculate for left cell
+	T = 1
+	r = section_prop.Ha/2
+	ha = section_prop.Ha
+	tspar = section_prop.tspar
+	tskin = section_prop.tskin
 	a1 = math.pi*ha**2/8  # enclosed area
-	intergrations = []
 
-	for i in [0, 1, 3, 4]:  # semi circle
-		sfab, sfbnb = shearflows[i]
-		distance = spacing[i]
-		r = roundintergration(sfab, sfbnb, distance,t_skin)
-		intergrations.append(r)
+	n = 1000
+	int_q1 = 0
+	int_q2 = 0#(q2(0) + q2(ha / 2)) * ha / 4 / tspar
+	int_q5 = 0#(q5(0) + q5(ha / 2)) * ha / 4 / tspar
+	int_q6 = 0
+	for i in range(n+1):
+		int_q1 += q1(i * np.pi / (2 * n)) * np.pi * r / (2 * n) / tskin
+		int_q6 += q6(i * np.pi / (2 * n)) * np.pi * r / (2 * n) / tskin
+		int_q2 += q2(r - i * r / n) * r / n / tspar
+		int_q5 += q5(r - i * r / n) * r / n / tspar
+	print(int_q2,(q2(0) + q2(ha / 2)) * ha / 4 / tspar)
+	print(int_q5,(q5(0) + q5(ha / 2)) * ha / 4 / tspar)
 
-	a, b = shearflows[2]  # spar
-	r_spar = roundintergration(a, b, spacing[2], t_spar)
-	intergrations.append(r_spar)
-
-	print(intergrations)
-
-	G_dtheta_dz = sum(intergrations)/2/a1
+	G_dtheta_dz = (int_q1+int_q2+int_q5+int_q6)/2/a1
 	J = T/G_dtheta_dz
 	return J
 
-
-T = 1  # torsion
-ha = Ha  # height of aileron, m
-distance = 0.07752484  # distance between booms, m
-t_skin = tskin
-t_spar = tspar
-
-shearflows_leftcell = [(0, 1), (0, 1), (0, 1), (0, 1), (0, 1)]
-print(len(shearflows_leftcell))
-
-a = torsionstiffness(T, shearflows_leftcell, t_skin, t_spar, distance, ha)
+a = torsionstiffness()
 print(a)
+

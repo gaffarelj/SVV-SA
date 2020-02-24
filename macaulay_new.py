@@ -272,6 +272,7 @@ def Mz(x):
         M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
     if x > x3:
         M += Rz3 * (x - x3)
+    return M
 
 
 x = np.linspace(0.0, 1.691, 500)

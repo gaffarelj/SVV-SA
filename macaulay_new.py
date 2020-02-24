@@ -28,7 +28,7 @@ x2 = 0.554
 x3 = 1.541
 xa = 0.272
 d1 = 0.00681
-d2 = 0.0203
+d3 = 0.0203
 theta = math.radians(26)
 P = 37.9e3
 
@@ -172,7 +172,7 @@ f3 = lambda x: b[0, 0] + b[1, 0] * x + b[2, 0] * x ** 2 + b[3, 0] * x ** 3 + b[4
 integral3 = S(f3, 0, La)
 eq3 = np.array([-xi * (La - x1), -xi * (La - x2), -xi * (La - x3), 0, 0, 0,
                 (math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (La - (x2 - (xa / 2))), 0, 0, 0, 0, 0])
-res3 = np.array([(math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (La - (x2 + (xa / 2))) - integral3])
+res3 = np.array([(math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * P * (La - (x2 + (xa / 2))) - integral3])
 
 # Equation 4
 eq4 = np.array([0, 0, 0, -1, -1, -1, -math.cos(theta), 0, 0, 0, 0, 0])
@@ -209,3 +209,66 @@ eq7 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, x1, 1, 0])
 res7 = np.array([-d1 * math.sin(theta)])
 
 # Equation 8
+eq8 = np.array([-(1 / (6 * E * sect.Izz)) * (x2 - x1) ** 3 - (xi ** 2 / (G * J)) * (x2 - x1), 0, 0, 0, 0, 0,
+                -(1 / (6 * E * sect.Izz)) * math.sin(theta) * (xa / 2) ** 3 + (xi / (G * J)) * (
+                        math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (xa / 2), x1, 1, 0, 0, xi])
+res8 = np.array([-(1 / (E * sect.Izz)) * S(fq, 0, x2) - (1 / (G * J)) * S(fd, 0, x2) * xi])
+
+# Equation 9
+eq9 = np.array(
+    [0, 0, 0, (1 / (6 * E * sect.Izz)) * (x2 - x1) ** 3, 0, 0, (math.cos(theta) / (6 * E * sect.Izz)) * (xa / 2) ** 3,
+     0, 0, x2, 1, 0])
+res9 = np.array([0])
+
+# Equation 10
+eq10 = np.array([-(1 / (6 * E * sect.Izz)) * (x3 - x1) ** 3 - (xi ** 2 / (G * J)) * (x3 - x1),
+                 -(1 / (6 * E * sect.Izz)) * (x3 - x2) ** 3 - (xi ** 2 / (G * J)) * (x3 - x2), 0, 0, 0, 0,
+                 -(math.sin(theta) / (6 * E * sect.Izz)) * (x3 - (x2 - (xa / 2))) ** 3 + (xi / (G * J)) * (
+                         math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (x3 - (x2 - (xa / 2))), x3, 1, 0, 0,
+                 xi])
+res10 = np.array([d3 * math.cos(theta) - ((P * math.sin(theta)) / (6 * E * sect.Izz)) * (x3 - (x2 + (xa / 2))) ** 3 + (
+        1 / (E * sect.Izz)) * S(fq, 0, x3) + (xi / (G * J)) * (
+                          math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * P * (x3 - (x2 + (xa / 2))) - (
+                          xi / (G * J)) * S(fd, 0, x3)])
+
+# Equation 11
+eq11 = np.array([0, 0, 0, (1 / (6 * E * sect.Iyy)) * (x3 - x1) ** 3, (1 / (6 * E * sect.Iyy)) * (x3 - x2) ** 3, 0,
+                 (math.cos(theta) / (6 * E * sect.Iyy)) * (x3 - (x2 - (xa / 2))) ** 3, 0, 0, x3, 1, 0])
+res11 = np.array([-d3 * math.sin(theta) + ((P * math.cos(theta)) / (6 * E * sect.Iyy)) * (x3 - (x2 + (xa / 2))) ** 3])
+
+# Equation 12
+eq12 = np.array([0, 0, 0, (1 / (6 * E * sect.Iyy)) * (x2 - (xa / 2) - x1) ** 3, 0, 0, 0, 0, 0, (x2 - (xa / 2)), 1, 0])
+res12 = np.array([0])
+
+# Solve the system
+A = np.array([eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, eq9, eq10, eq11, eq12])
+y = np.array([res1, res2, res3, res4, res5, res6, res7, res8, res9, res10, res11, res12])
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
+
+
+# Moments about y
+def My(x):
+    if x < x1:
+        M = 0
+    elif x < x2 - (xa / 2):
+        M = -Rz1 * (x - x1)
+    elif x < x2:
+        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2)))
+    elif x < x2 + (xa / 2):
+        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2)
+    elif x < x3:
+        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2) + P * math.cos(theta) * (
+                    x - (x2 + (xa / 2)))
+    elif x <= La:
+        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2) + P * math.cos(theta) * (
+                x - (x2 + (xa / 2))) + Rz3 * (x - x3)
+    return M
+
+
+x = np.linspace(0.0, 1.691, 500)
+y = np.zeros((500, 1))
+for i in range(500):
+    y[i, 0] = My(x[i])
+
+plt.plot(x, y)
+plt.show()

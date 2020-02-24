@@ -261,7 +261,7 @@ def My(x):
     return M
 
 def Mz(x):
-    M = S(f2, 0, x)
+    M = -S(f2, 0, x)
     if x > x1:
         M += Ry1 * (x - x1)
     if x > x2 - (xa / 2):
@@ -272,7 +272,7 @@ def Mz(x):
         M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
     if x > x3:
         M += Rz3 * (x - x3)
-    return M
+    return -M
 
 
 x = np.linspace(0.0, 1.691, 500)

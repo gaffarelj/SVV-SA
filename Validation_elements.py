@@ -5,7 +5,7 @@ import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
 def scatter3d(x,y,z, cs, colorsMap='jet'):
     cm = plt.get_cmap(colorsMap)
-    cNorm = matplotlib.colors.Normalize(vmin=min(cs), vmax=max(cs))
+    cNorm = matplotlib.colors.Normalize(vmin=0, vmax=1)
     scalarMap = cmx.ScalarMappable( cmap=cm)
     fig = plt.figure()
     ax = Axes3D(fig)
@@ -13,6 +13,7 @@ def scatter3d(x,y,z, cs, colorsMap='jet'):
     scalarMap.set_array(cs)
     fig.colorbar(scalarMap)
     plt.show()
+
 
 # starting to couple every element with 4 points.
 ######################################## loading data ##########################################
@@ -35,10 +36,11 @@ path = 'data/Displ_jamstraight.csv'
 file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
 file.close()
-
+'''
 # optional --> add displacement to all nodes
 
 nodes[:,1:] = nodes[:,1:] + displ_dat[:,2:]
+'''
 
 # define a collecting array for all result data
 data = np.zeros((np.size(elements),5))
@@ -72,15 +74,15 @@ for j in range(np.shape(elements)[0]):
 
 ######################################### Plotting in 4D #####################################
 
-
+'''
 data = data.transpose()
 
 
 scatter3d(data[0],data[1],data[2],data[4])
-
+'''
 
 ##################################### plotting  slices with unknown spacing ####################
-'''
+
 next_section = np.unique(data[:,0])
 
 # select a cross section place to monitor the stresses
@@ -137,9 +139,8 @@ for numb in range(np.shape(next_section)[0]):
 # plot list of error
 
 plt.plot(xloc,discr_miss,xloc,discr_shear)
-#plt.show()
+plt.show()
 
-'''
 
 
 

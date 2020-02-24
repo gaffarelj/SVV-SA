@@ -260,6 +260,7 @@ def My(x):
         M -= Rz3 * (x - x3)
     return M
 
+
 def Mz(x):
     M = -S(f2, 0, x)
     if x > x1:
@@ -275,10 +276,104 @@ def Mz(x):
     return -M
 
 
+def T(x):
+    T = S(f3, 0, x)
+    if x > x1:
+        T += Ry1 * (-xi)
+    if x > x2 - (xa / 2):
+        T += (math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * Fa
+    if x > x2:
+        T += Ry2 * (-xi)
+    if x > x2 + (xa / 2):
+        T -= (math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * P
+    if x > x3:
+        T += Ry3 * (-xi)
+    return -T
+
+
+def Sz(x):
+    F = 0
+    if x > x1:
+        F -= Rz1
+    if x > x2 - (xa / 2):
+        F -= math.cos(theta) * Fa
+    if x > x2:
+        F -= Rz2
+    if x > x2 + (xa / 2):
+        F += math.cos(theta) * P
+    if x > x3:
+        F -= Rz3
+    return F
+
+
+def Sy(x):
+    F = -S(f5, 0, x)
+    if x > x1:
+        F += Ry1
+    if x > x2 - (xa / 2):
+        F += math.sin(theta) * Fa
+    if x > x2:
+        F += Ry2
+    if x > x2 + (xa / 2):
+        F -= math.sin(theta) * P
+    if x > x3:
+        F += Ry3
+    return F
+
+
+def v(x):
+    core = -S(fq, 0, x)
+    if x > x1:
+        core += Ry1 * (x - x1) ** 3
+    if x > x2 - (xa / 2):
+        core += math.sin(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+    if x > x2:
+        core += Ry2 * (x - x2) ** 3
+    if x > x2 + (xa / 2):
+        core -= math.sin(theta) * P * (x - (x2 + (xa / 2))) ** 3
+    if x > x3:
+        core += Ry3 * (x - x3) ** 3
+    v = -(1 / (E * sect.Izz)) * core + C1 * x + C2
+    return v
+
+
+def w(x):
+    core = 0
+    if x > x1:
+        core -= Rz1 * (x - x1) ** 3
+    if x > x2 - (xa / 2):
+        core -= math.cos(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+    if x > x2:
+        core -= Rz2 * (x - x2) ** 3
+    if x > x2 + (xa / 2):
+        core += math.cos(theta) * P * (x - (x2 + (xa / 2))) ** 3
+    if x > x3:
+        core -= Rz3 * (x - x3) ** 3
+    v = -(1 / (E * sect.Iyy)) * core + C3 * x + C4
+    return v
+
+
+def alpha(x):
+    core = S(fd, 0, x)
+    if x > x1:
+        core += -xi * Ry1 * (x - x1)
+    if x > x2 - (xa / 2):
+        core += (math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * Fa * (x - (x2 - (xa / 2)))
+    if x > x2:
+        core -= -xi * Ry2 * (x - x2)
+    if x > x2 + (xa / 2):
+        core += (math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * P * (x - (x2 + (xa / 2)))
+    if x > x3:
+        core -= -xi * Ry3 * (x - x3)
+    alpha = -(1 / (G * J)) * core + C5
+    angle = math.degrees(alpha)
+    return angle
+
+
 x = np.linspace(0.0, 1.691, 500)
 y = np.zeros((500, 1))
 for i in range(500):
-    y[i, 0] = Mz(x[i])
+    y[i, 0] = Sz(x[i])
 
 plt.plot(x, y)
 plt.show()

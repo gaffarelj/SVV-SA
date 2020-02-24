@@ -178,6 +178,14 @@ def shear_centre(n):
     m6 = int_q6 * sect.r
 
     # FINAL COMPUTATION
-    xi = (m1 + m3 + m4 + m6)
+    xi = -(m1 + m3 + m4 + m6)
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
+
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+#Verification
+#our_zc = xi - sect.r
+#print("our zc:", our_zc)
+#ans = -0.09185594953325857
+#print("should be:", ans)
+#print("error:", our_zc - ans, round((our_zc - ans) * 100 / ans, 4), "%")

@@ -1,17 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
-import matplotlib.cm as cmx
-import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
-def scatter3d(x,y,z, cs, colorsMap='jet'):
-    cm = plt.get_cmap(colorsMap)
-    cNorm = matplotlib.colors.Normalize(vmin=0, vmax=1)
-    scalarMap = cmx.ScalarMappable( cmap=cm)
+def scatter3d(x,y,z, cs):
     fig = plt.figure()
     ax = Axes3D(fig)
-    ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
-    scalarMap.set_array(cs)
-    fig.colorbar(scalarMap)
+    pl = ax.scatter(x, y, z, c=cs, cmap='coolwarm')
+    plt.colorbar(pl)
     plt.show()
 
 
@@ -74,15 +68,15 @@ for j in range(np.shape(elements)[0]):
 
 ######################################### Plotting in 4D #####################################
 
-'''
+
 data = data.transpose()
 
 
-scatter3d(data[0],data[1],data[2],data[4])
-'''
+scatter3d(data[0],data[1],data[2],data[3])
+
 
 ##################################### plotting  slices with unknown spacing ####################
-
+'''
 next_section = np.unique(data[:,0])
 
 # select a cross section place to monitor the stresses
@@ -140,10 +134,7 @@ for numb in range(np.shape(next_section)[0]):
 
 plt.plot(xloc,discr_miss,xloc,discr_shear)
 plt.show()
-
-
-
-
+'''
 
 
 

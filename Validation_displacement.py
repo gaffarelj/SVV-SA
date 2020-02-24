@@ -21,4 +21,4 @@ file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
 file.close()
 
-
+hingeline = np.zeros()

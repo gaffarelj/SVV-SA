@@ -181,9 +181,3 @@ def shear_centre(n):
     xi = (m1 + m3 + m4 + m6)
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
-
-qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
-print(qsI, qsII, xi)
-print(xi)
-print(-(-0.09185594953325857+sect.r))
-print("e", (xi - -(-0.09185594953325857+sect.r)))

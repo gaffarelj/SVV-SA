@@ -158,7 +158,7 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
 
 
-section_coordinates, section_loads = get_load(n_chord=150, n_span=100, do_plot=True)
+#section_coordinates, section_loads = get_load(n_chord=150, n_span=100, do_plot=True)
 # Get the span coordinates (the x coordinate at every cut)
 # And the sections data, as follows:
 #	[
@@ -166,6 +166,6 @@ section_coordinates, section_loads = get_load(n_chord=150, n_span=100, do_plot=T
 #		[x2, [z1, load], [z2, load], ...],
 #		...
 #	]
-print(section_coordinates)
-print("\n", section_coordinates[10], "\n")
-print(section_loads[10])
+#print(section_coordinates)
+#print("\n", section_coordinates[10], "\n")
+#print(section_loads[10][1])

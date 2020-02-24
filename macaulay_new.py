@@ -211,7 +211,7 @@ res7 = np.array([-d1 * math.sin(theta)])
 # Equation 8
 eq8 = np.array([-(1 / (6 * E * sect.Izz)) * (x2 - x1) ** 3 - (xi ** 2 / (G * J)) * (x2 - x1), 0, 0, 0, 0, 0,
                 -(1 / (6 * E * sect.Izz)) * math.sin(theta) * (xa / 2) ** 3 + (xi / (G * J)) * (
-                        math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (xa / 2), x1, 1, 0, 0, xi])
+                        math.cos(theta) * (Ha / 2) - xi * math.sin(theta)) * (xa / 2), x2, 1, 0, 0, xi])
 res8 = np.array([-(1 / (E * sect.Izz)) * S(fq, 0, x2) - (1 / (G * J)) * S(fd, 0, x2) * xi])
 
 # Equation 9
@@ -243,25 +243,21 @@ res12 = np.array([0])
 # Solve the system
 A = np.array([eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, eq9, eq10, eq11, eq12])
 y = np.array([res1, res2, res3, res4, res5, res6, res7, res8, res9, res10, res11, res12])
-Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.lstsq(A, y, rcond=None)[0]
 
 
-# Moments about y
 def My(x):
-    if x < x1:
-        M = 0
-    elif x < x2 - (xa / 2):
-        M = -Rz1 * (x - x1)
-    elif x < x2:
-        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2)))
-    elif x < x2 + (xa / 2):
-        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2)
-    elif x < x3:
-        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2) + P * math.cos(theta) * (
-                    x - (x2 + (xa / 2)))
-    elif x <= La:
-        M = -Rz1 * (x - x1) - Fa * math.cos(theta) * (x - (x2 - (xa / 2))) - Rz2 * (x - x2) + P * math.cos(theta) * (
-                x - (x2 + (xa / 2))) + Rz3 * (x - x3)
+    M = 0
+    if x > x1:
+        M -= Rz1 * (x - x1)
+    if x > x2 - (xa / 2):
+        M -= Fa * math.cos(theta) * (x - (x2 - (xa / 2)))
+    if x > x2:
+        M -= Rz2 * (x - x2)
+    if x > x2 + (xa / 2):
+        M += P * math.cos(theta) * (x - (x2 + (xa / 2)))
+    if x > x3:
+        M -= Rz3 * (x - x3)
     return M
 
 

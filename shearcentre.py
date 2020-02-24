@@ -1,12 +1,11 @@
 from integration import integrate as S
-import sectionproperties as SP
 import numpy as np
 
-sect= SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+sect = None
 
-#class shear():
-#    def __init__(self, sect):
-#        print(self.Izz)
+def set_sect(section):
+    global sect
+    sect = section
 
 
 def qb_1(theta):  # SECTION 1: 0 to pi/2
@@ -182,7 +181,7 @@ def shear_centre(n):
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 #Verification
 #our_zc = xi - sect.r
 #print("our zc:", our_zc)

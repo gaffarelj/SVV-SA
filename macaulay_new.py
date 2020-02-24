@@ -260,11 +260,24 @@ def My(x):
         M -= Rz3 * (x - x3)
     return M
 
+def Mz(x):
+    M = S(f2, 0, x)
+    if x > x1:
+        M += Ry1 * (x - x1)
+    if x > x2 - (xa / 2):
+        M += Fa * math.sin(theta) * (x - (x2 - (xa / 2)))
+    if x > x2:
+        M += Ry2 * (x - x2)
+    if x > x2 + (xa / 2):
+        M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
+    if x > x3:
+        M += Rz3 * (x - x3)
+
 
 x = np.linspace(0.0, 1.691, 500)
 y = np.zeros((500, 1))
 for i in range(500):
-    y[i, 0] = My(x[i])
+    y[i, 0] = Mz(x[i])
 
 plt.plot(x, y)
 plt.show()

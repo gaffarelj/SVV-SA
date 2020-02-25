@@ -1,4 +1,5 @@
 from integration import integrate as S
+import sectionproperties as SP
 import numpy as np
 
 sect = None
@@ -69,6 +70,10 @@ def qb_6(theta):  # SECTION 6: -pi/2 to 0
 
 
 def shear_centre(n):
+    global sect
+    if sect is None:
+        sect = SP.section()
+
     # REDUNDANT SHEAR
 
     # CELL I
@@ -182,7 +187,7 @@ def shear_centre(n):
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
 #qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
-#Verification
+##Verification
 #our_zc = xi - sect.r
 #print("our zc:", our_zc)
 #ans = -0.09185594953325857

@@ -67,3 +67,35 @@ if round(unittest_coord, 4) != 0.0016:
 
 print("No AssertionErrors have arised, and the comp_coord function works correctly")
 
+
+
+
+def interp_coords(coordinates, n, N, l, c_type):
+	"""
+	Interpolate the new coordinates for interpolation (in one direction), between the existing ones.
+	Inputs:
+		- coordinates: existing coordinates
+		- n: number of new coordinates specified for interpolation
+		- N: number of existing coordinates
+		- l: length of the span or chord
+		- c_type: coordinate type/direction: "x" or "z"
+	"""
+	n = max(2, n)						# Make sure there is at least two points for the interpolation
+	mesh_size = N / n					# Compute the mesh size: existing number of coord. / specified for interp.
+	mesh_coords = [coordinates[0]]		# Set first interp. coord. as the first existing one
+	for i in range(1, n-1):				# Compute new interp. coord. 
+		mesh_i = i * mesh_size			# Fake row/column index = mesh size * step
+		mesh_coord = comp_coord(mesh_i, N, l, c_type)	# Compute the actual coordinate, as from row/column index
+		mesh_coords.append(mesh_coord)
+	mesh_coords.append(coordinates[-1])	# Set last interp. coord. as the last existing one
+	return mesh_coords
+
+
+unittest_interp_coords = interp_coords([1,2], 1, 1, 1, "z")        
+    raise AssertionError
+    
+unittest_interp_coords = interp_coords([1,2], 3, 3, 3, "x")        
+if unittest_interp_coords != [1, 0.3749999999999999, 2]:
+    raise AssertionError
+
+print("No AssertionErrors have arised, and the comp_coord function works correctly")

@@ -1,9 +1,6 @@
 import math
 import numpy as np
 
-import sectionproperties as SP
-import shearcentre as SC
-
 def tosionalstiffness(section_prop):
 	T = 1  # unit force
 	r = section_prop.Ha / 2  # radius of semi circle

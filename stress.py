@@ -17,11 +17,11 @@ class stress():
 	def section_stress(self):
 		# Hinge
 		z = 0
-		ys = np.arange(-self.r, self.r, 0.005)
+		ys = np.arange(-self.r, self.r, 0.0025)
 		for y in ys:
 			self.add_res(z, y)
 		# Circle
-		for theta in np.arange(0, np.pi, 0.05):
+		for theta in np.arange(0, np.pi, 0.025):
 			z = np.sin(theta) * self.r
 			y = np.cos(theta) * self.r
 			self.add_res(z, y)
@@ -53,4 +53,9 @@ class stress():
 		plt.ylabel("y [m]")
 		plt.scatter(z, y, c=s)
 		plt.colorbar()
+		plt.set_cmap("jet")
+		z_line = np.arange(-0.2, 0.2, 0.001)
+		alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
+		y_line = [z_c * np.sin(alpha) for z_c in z_line]
+		plt.plot(z_line, y_line)
 		plt.show()

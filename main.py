@@ -14,14 +14,15 @@ SC.set_sect(sect)
 xi = -0.007513567161803937
 
 _, _, J = TS.tosionalstiffness(sect)
-# J = 8.629971582027014e-06
 
-MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
-Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
-MC.do_plots()
-MC.plot_result(MC.My, "My_b")
+#MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
+#Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
+#MC.do_plots()
+#MC.plot_result(MC.My, "My_b")
 
-
-s = STR.stress(0.554, MC.Mz, MC.My, sect)
+x = 0.554
+#Mz, My = MC.Mz(x)[0], MC.My(x)[0]
+Mz, My = -34645.28891973, 11032.63656645*10
+s = STR.stress(Mz, My, sect)
 s.section_stress()
 s.plot_stress()

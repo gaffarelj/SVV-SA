@@ -1,18 +1,16 @@
 import numpy as np
 from matplotlib import pyplot as plt
-
+import matplotlib as mpl
 
 class stress():
-	def __init__(self, x, Mz_f, My_f, sect):
+	def __init__(self, Mz, My, sect):
 		self.Iyy = sect.Iyy
 		self.Izz = sect.Izz
-		self.x = x
-		self.Mz_f = Mz_f
-		self.My_f = My_f
+		self.Mz = Mz
+		self.My = My
 		self.stresses = []
 		self.r = sect.r
 		self.beta = sect.beta
-		self.l_spar_to_end = sect.l_spar_to_end
 		self.l_topskin = sect.l_topskin
 		self.zc = sect.z_centroid
 
@@ -23,7 +21,7 @@ class stress():
 		for y in ys:
 			self.add_res(z, y)
 		# Circle
-		for theta in np.arange(0, np.pi, 0.125):
+		for theta in np.arange(0, np.pi, 0.05):
 			z = np.sin(theta) * self.r
 			y = np.cos(theta) * self.r
 			self.add_res(z, y)
@@ -51,6 +49,8 @@ class stress():
 		z, y, s = data[:,0], data[:,1], data[:,2]
 		plt.xlim(0.225, -0.325)
 		plt.ylim(-0.09, 0.09)
+		plt.xlabel("z [m]")
+		plt.ylabel("y [m]")
 		plt.scatter(z, y, c=s)
 		plt.colorbar()
 		plt.show()

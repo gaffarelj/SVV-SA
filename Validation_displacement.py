@@ -1,6 +1,26 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import macaulay as MC
+
+import sectionproperties as SP
+import shearcentre as SC
+import macaulay as MC
+import  torsionstiffness as TS
+import stress as STR
+
+sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+
+SC.set_sect(sect)
+#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
+xi = -0.007513567161803937
+
+_, _, J = TS.tosionalstiffness(sect)
+
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
+MC.do_plots()
+MC.plot_result(MC.My, "My_b")
 
 path = 'data/nodes.txt'
 file = open(path, "r")
@@ -10,11 +30,6 @@ file.close()
 path = 'data/elements.txt'
 file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
-file.close()
-
-path = 'data/Bending_result_notext_dat.csv'
-file = open(path, "r")
-data_frame = np.genfromtxt(path, delimiter=";", skip_header=0)
 file.close()
 
 path = 'data/Displ_jamstraight.csv'
@@ -34,30 +49,42 @@ for i in range(np.shape(nodes)[0]):
         hingeline[k,0] = nodes[i,0]
         # Second value is the original position along the x-axis
         hingeline[k,1] = nodes[i,1]
-        # creates copy to compare against (Original)
-        original[k, 0] = nodes[i,1]
-        original[k, 1:] = 0
         k += 1
 
+# get out the displacement per node
 for i in range(np.shape(hingeline)[0]):
-    hingeline[i,1] = hingeline[i,1] + displ_dat[int(hingeline[i,0]),2]
+    #hingeline[i,1] = hingeline[i,1] #+ displ_dat[int(hingeline[i,0]),2]
     hingeline[i,2] = displ_dat[int(hingeline[i,0]),3]
-    hingeline[i,3] = displ_dat[int(hingeline[i, 0]),4]
+    hingeline[i,3] = displ_dat[int(hingeline[i,0]),4]
 
+x_coords = hingeline[:,1]/1000
+
+# change units to m instead of mm
+
+hingeline = hingeline/1000
+disp_num = np.zeros((np.shape(x_coords)[0],3))
+disp_num[:,0] = x_coords
+
+# compute v = y w = z displacement
+for i in range(np.shape(x_coords)[0]):
+    disp_num[i,1] = MC.v(x_coords[i])
+    disp_num[i,2] = MC.w(x_coords[i])
+
+disp_num = disp_num
 
 hingeline = hingeline.transpose()
-original = original.transpose()
-# plotting the result
+disp_num = disp_num.transpose()
+
 
 fig = plt.figure()
 
 ax = Axes3D(fig)
-ax.scatter(hingeline[1],hingeline[2],hingeline[3])
-ax.scatter(original[0],original[1],original[2])
+ax.scatter(hingeline[1],hingeline[3],hingeline[2])
+ax.scatter(disp_num[0],disp_num[1],disp_num[2])
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
-ax.set_xlim3d(0, 2500)
-ax.set_ylim3d(-10,10)
-ax.set_zlim3d(-10, 10)
+#ax.set_xlim3d(0, 2500)
+#ax.set_ylim3d(-10,10)
+#ax.set_zlim3d(-10, 10)
 plt.show()

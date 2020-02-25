@@ -4,8 +4,12 @@ from mpl_toolkits.mplot3d import Axes3D
 def scatter3d(x,y,z, cs):
     fig = plt.figure()
     ax = Axes3D(fig)
+    ax.set_xlim3d(0, 2500)
+    ax.set_ylim3d(-1250, 1250)
+    ax.set_zlim3d(-1000, 1000)
     pl = ax.scatter(x, y, z, c=cs, cmap='coolwarm')
     fig.colorbar(pl)
+
     plt.show()
 
 

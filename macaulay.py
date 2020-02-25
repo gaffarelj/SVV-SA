@@ -245,7 +245,7 @@ def Sy(x):
         F -= math.sin(theta) * P
     if x > x3:
         F += Ry3
-    return -F
+    return F
 
 def v(x):
     core = -S(fq, 0, x)

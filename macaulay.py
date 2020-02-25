@@ -311,3 +311,4 @@ def do_plots():
     plot_result(T, "T")
     plot_result(My, "My")
     plot_result(Mz, "Mz")
+

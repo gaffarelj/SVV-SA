@@ -4,13 +4,7 @@ import numpy as np
 import sectionproperties as SP
 import shearcentre as SC
 
-section_prop = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
-# The following parameters can be used out of section_prop (example: print(section_prop.z_centroid)
-# Iyy, Izz, Am, z_centroid, stiff_area, boomcoords, boomcoords_hinge,
-# tskin, tspar, hstiff, tstiff, wstiff, Ha, Ca, r, l_topskin, beta, l_spar_to_end
-SC.set_sect(section_prop)
-
-def tosionalstiffness():
+def tosionalstiffness(section_prop):
 	T = 1  # unit force
 	r = section_prop.Ha / 2  # radius of semi circle
 	ha = section_prop.Ha  # height of the aileron

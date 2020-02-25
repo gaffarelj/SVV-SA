@@ -29,5 +29,4 @@ def tosionalstiffness():
 
 	result = np.linalg.solve(A,b)
 	J = 1/result[-1, 0]
-	return result[0], result[1], J
-
+	return result[0, 0], result[1, 0], J

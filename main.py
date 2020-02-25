@@ -12,7 +12,6 @@ SC.set_sect(section_prop)
 qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 
 _, _, J = TS.tosionalstiffness()
-# J = 8.629971582027014e-06
 
 MC.set_vars(xi, J, section_prop.r, section_prop.Izz, section_prop.Iyy)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()

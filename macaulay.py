@@ -115,6 +115,7 @@ def system():
     y = np.array([res1, res2, res3, res4, res5, res6, res7, res8, res9, res10, res11, res12])
     print("Macaulay: solving system...")
     Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.lstsq(A, y, rcond=None)[0]
+    #Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
     return  Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
 
 

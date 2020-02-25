@@ -202,7 +202,7 @@ def Mz(x):
     if x > x2 + (xa / 2):
         M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
     if x > x3:
-        M += Rz3 * (x - x3)
+        M += Ry3 * (x - x3)
     return M
 
 def T(x):

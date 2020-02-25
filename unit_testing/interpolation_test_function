@@ -23,6 +23,47 @@ unittest_interp = interp_two_points(-50, -100, 100., 100., -100.)   #testing int
 if unittest_interp != 50.:
     raise AssertionError
 
-
-
 print("No AssertionErrors have arised, and the interp_two_points function works correctly")
+
+
+def comp_theta(i, N):
+	"""
+	Compute angle theta, as specified in the Assignment PDF.
+	"""
+	return (i - 1) / N * math.pi
+
+unittest_theta = comp_theta(5, -5)        #testing theta function with point i = 5 and N = -5 and checking whether it gives -2.51
+if round(unittest_theta, 2) != -2.51:
+    raise AssertionError
+    
+unittest_theta = comp_theta(10, 1200)        #testing theta function with point i = 5 and N = -5 and checking whether it gives -2.51
+if round(unittest_theta, 2) != 0.02:
+    raise AssertionError
+
+print("No AssertionErrors have arised, and the comp_theta function works correctly")
+
+def comp_coord(i, N, l, c_type):
+	"""
+	Compute the coordinate, accordingly to the Assignment PDF.
+	Inputs:
+		- i: index of the row/column
+		- N: total number of rows/columns
+		- l: chord/span lenght
+	Both computation for x and z coordinates have been combined in this function.
+	"""
+	theta = comp_theta(i, N)
+	theta_1 = comp_theta(i + 1, N)
+	f = -1 if c_type == "z" else 1
+	coord = f / 2 * (l / 2 * (1 - math.cos(theta)) + l / 2 * (1 - math.cos(theta_1)))
+	return coord
+
+unittest_coord = comp_coord(10, 1200, 10, "z")        #testing coordinate function with point i = 10 and N = 1200, l = 10 and c_type = z and checking whether it gives -0.0016
+if round(unittest_coord, 4) != -0.0016:
+    raise AssertionError
+    
+unittest_coord = comp_coord(10, 1200, 10, 5)        #testing coordinate function with point i = 10 and N = 1200, l = 10 and c_type = else and checking whether it gives 0.0016
+if round(unittest_coord, 4) != 0.0016:
+    raise AssertionError
+
+print("No AssertionErrors have arised, and the comp_coord function works correctly")
+

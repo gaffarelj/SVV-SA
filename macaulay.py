@@ -89,7 +89,7 @@ def system():
     res8 = np.array([-(1 / (E * Izz)) * S(fq, 0, x2) - (1 / (G * J)) * S(fd, 0, x2) * xi])
     
     eq9 = np.array(
-        [0, 0, 0, (1 / (6 * E * Izz)) * (x2 - x1) ** 3, 0, 0, (math.cos(theta) / (6 * E * Izz)) * (xa / 2) ** 3,
+        [0, 0, 0, (1 / (6 * E * Iyy)) * (x2 - x1) ** 3, 0, 0, (math.cos(theta) / (6 * E * Iyy)) * (xa / 2) ** 3,
          0, 0, x2, 1, 0])
     res9 = np.array([0])
     
@@ -98,10 +98,10 @@ def system():
                      -(math.sin(theta) / (6 * E * Izz)) * (x3 - (x2 - (xa / 2))) ** 3 + (xi / (G * J)) * (
                              math.cos(theta) * r - xi * math.sin(theta)) * (x3 - (x2 - (xa / 2))), x3, 1, 0, 0,
                      xi])
-    res10 = np.array([d3 * math.cos(theta) - ((P * math.sin(theta)) / (6 * E * Izz)) * (x3 - (x2 + (xa / 2))) ** 3 + (
-            1 / (E * Izz)) * S(fq, 0, x3) + (xi / (G * J)) * (
-                              math.cos(theta) * r - xi * math.sin(theta)) * P * (x3 - (x2 + (xa / 2))) - (
-                              xi / (G * J)) * S(fd, 0, x3)])
+    res10 = np.array([d3 * math.cos(theta) - ((P * math.sin(theta)) / (6 * E * Izz)) * (x3 - (x2 + (xa / 2))) ** 3 + \
+        (1 / (E * Izz)) * S(fq, 0, x3) + \
+               (xi / (G * J)) * (math.cos(theta) * r - xi * math.sin(theta)) * P * (x3 - (x2 + (xa / 2))) -\
+              (xi / (G * J)) * S(fd, 0, x3)])
     
     eq11 = np.array([0, 0, 0, (1 / (6 * E * Iyy)) * (x3 - x1) ** 3, (1 / (6 * E * Iyy)) * (x3 - x2) ** 3, 0,
                      (math.cos(theta) / (6 * E * Iyy)) * (x3 - (x2 - (xa / 2))) ** 3, 0, 0, x3, 1, 0])
@@ -115,6 +115,7 @@ def system():
     y = np.array([res1, res2, res3, res4, res5, res6, res7, res8, res9, res10, res11, res12])
     print("Macaulay: solving system...")
     Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.lstsq(A, y, rcond=None)[0]
+    #Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
     return  Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
 
 
@@ -201,7 +202,7 @@ def Mz(x):
     if x > x2 + (xa / 2):
         M -= P * math.sin(theta) * (x - (x2 + (xa / 2)))
     if x > x3:
-        M += Rz3 * (x - x3)
+        M += Ry3 * (x - x3)
     return M
 
 def T(x):

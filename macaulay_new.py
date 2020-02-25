@@ -369,11 +369,20 @@ def alpha(x): #Check!
     angle = math.degrees(alpha)
     return -alpha
 
-
-x = np.linspace(0.0, 1.691, 500)
-y = np.zeros((500, 1))
-for i in range(500):
-    y[i, 0] = alpha(x[i])
-
-plt.plot(x, y)
-plt.show()
+def plot_result(f, legend, show_plot=False, dx=0.005, l=1.691):
+    x = np.arange(0.0, l, dx)
+    y = [f(xi) for xi in x]
+    plt.plot(x, y)
+    plt.title(f"{legend}(x)")
+    if show_plot: plt.show()
+    plt.savefig(f"plots/macaulay/{legend}.pdf")
+    plt.close()
+    
+plot_result(alpha, "alpha")
+plot_result(w, "w")
+plot_result(v, "v")
+plot_result(Sy, "Sy")
+plot_result(Sz, "Sz")
+plot_result(T, "T")
+plot_result(My, "My")
+plot_result(Mz, "Mz")

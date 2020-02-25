@@ -85,5 +85,8 @@ def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
 
 
 comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area)
+print("No AssertionErrors have arised, and the comp_centroid function works correctly")
 comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area)
+print("No AssertionErrors have arised, and the comp_Iyy function works correctly")
 comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area)
+print("No AssertionErrors have arised, and the comp_Izz function works correctly")

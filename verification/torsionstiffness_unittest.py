@@ -45,13 +45,31 @@ print ('sectionproperty:tskin ', sect.tskin)
 print ('original torsstif', J)
 print (res1, res2)
 J_original = J
+print ('__________')
+
 
 #skin thickness multiplication by two
 sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
 sect.tskin = 2*sect.tskin
 res1, res2, J = tosionalstiffness(sect)
+print ('sectionprop: skin thickn', sect.tskin)
+print ('torsstif', J, res1, res2)
+discr = ((J-J_original)/J_original)*100
+diff = J/J_original
+print ('increase factor', diff)
+print ('')
+print ('__________')
+
+#Hence, skinthickness factor by 2, leads to torsional stifnnes factor of 2, this is not right, as J(t**3)
+
+#skin thickness multiplication by two
+sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+sect.tskin = sect.tskin**0.5
+res1, res2, J = tosionalstiffness(sect)
 print ('sectionprop', sect.tskin)
 print ('torsstif', J)
 discr = ((J-J_original)/J_original)*100
 diff = J/J_original
-print ('increase see' diff)
+print ('increase factor', diff)
+print('sqrt of tors. stifnn = ', math.sqrt(J_original)/J_original)
+print ('__________')

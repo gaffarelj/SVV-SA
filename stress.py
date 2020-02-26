@@ -47,14 +47,14 @@ class stress():
 				tau = self.add_shear(z, y, s, self.q1)
 			self.add_vonMises(y, z, sigma, tau, self.tskin)
 		# Top sheet
-		for s in np.arange(0, self.l_topskin, 0.005):
+		for s in np.arange(0, self.l_topskin, 0.0025):
 			z = -s * np.cos(self.beta)
 			y = self.r - s * np.sin(self.beta)
 			sigma = self.add_stress(z, y)
 			tau = self.add_shear(z, y, s, self.q3)
 			self.add_vonMises(y, z, sigma, tau, self.tskin)
 		# Bottom sheet
-		for s in np.arange(0, self.l_topskin, 0.005):
+		for s in np.arange(0, self.l_topskin, 0.0025):
 			z = -s * np.cos(self.beta)
 			y = -self.r + s * np.sin(self.beta)
 			sigma = self.add_stress(z, y)
@@ -81,7 +81,7 @@ class stress():
 		vm = math.sqrt(stress ** 2 / 2 + 3 * (shear / t) ** 2)
 		self.vm_stresses.append([z, y, vm])
 
-	def plot(self, data, fname):
+	def plot(self, data, fname, label):
 		z, y, s = data[:,0], data[:,1], data[:,2]
 		fig = plt.figure()
 		ax = fig.add_subplot(111)
@@ -93,7 +93,7 @@ class stress():
 		plt.scatter(z, y, c=s, s=3)
 		divider = make_axes_locatable(ax)
 		cax = divider.append_axes("right", size="3%", pad=0.1)
-		plt.colorbar(cax=cax)
+		plt.colorbar(cax=cax, label=label)
 		plt.set_cmap("jet")
 		plt.savefig(f"plots/stresses/{fname}.pdf")
 		#z_line = np.arange(-0.2, 0.2, 0.001)
@@ -103,6 +103,6 @@ class stress():
 		plt.show()
 
 	def plot_all(self):
-		self.plot(np.array(self.stresses), "s")
-		self.plot(np.array(self.vm_stresses), "vm")
-		self.plot(np.array(self.shear_flows), "sf")
+		self.plot(np.array(self.stresses), "s", "Normal stress")
+		self.plot(np.array(self.vm_stresses), "vm", "von Mises stress")
+		self.plot(np.array(self.shear_flows), "sf", "Shear flow")

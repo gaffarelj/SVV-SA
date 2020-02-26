@@ -44,7 +44,6 @@ N, l, c_type = 5, 3, "z"
 coords = [1, 2, 3, 4, 5]
 coords = [I.comp_coord(i, N, l , c_type) for i in coords]
 unittest_interp_coords = I.interp_coords(coords, 20, N, l, c_type)
-plt.figure(figsize=(10,1))
 plt.plot(coords, np.zeros(len(coords)), marker="x", linewidth=0.5, label="Given")
 plt.plot(unittest_interp_coords, np.ones(len(unittest_interp_coords)), marker="x", linewidth=0.5, label="Interpolated")
 plt.legend()

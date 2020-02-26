@@ -1,6 +1,7 @@
 import stress as STR
 import numpy as np
 from matplotlib import pyplot as plt
+plt.tight_layout()
 
 def get_max(Mz_f, My_f, Sz_f, Sy_f, sect, q1, q2, q3, q4, q5, q6, do_plot=False, dx=0.001):
 	max_s, max_q, max_vm = float("-Inf"), float("-Inf"), float("-Inf")
@@ -44,6 +45,6 @@ def get_max(Mz_f, My_f, Sz_f, Sy_f, sect, q1, q2, q3, q4, q5, q6, do_plot=False,
 		ax3.plot(xs, vms)
 		ax3.set_ylabel("von Mises stress [Pa]")
 		ax3.set_xlabel("x [m]")
-		plt.savefig(f"plots/stresses/stress-along-x.pdf")
+		plt.savefig(f"plots/stresses/stress-along-x.pdf", bbox_inches='tight')
 		plt.show()
 	return max_s, max_s_x, max_q, max_q_x, max_vm, max_vm_x

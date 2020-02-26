@@ -97,7 +97,7 @@ class stress():
 		cax = divider.append_axes("right", size="3%", pad=0.1)
 		plt.colorbar(cax=cax, label=label)
 		plt.set_cmap("jet")
-		plt.savefig(f"plots/stresses/{fname}-{str(x).replace('.', '-')}.pdf")
+		plt.savefig(f"plots/stresses/{fname}-{str(x).replace('.', '-')}.pdf", bbox_inches='tight')
 		#z_line = np.arange(-0.2, 0.2, 0.001)
 		#alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
 		#y_line = [z_c * np.sin(alpha) for z_c in z_line]

@@ -18,10 +18,6 @@ MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
 MC.do_plots()
 
-# Hard coded for x = 0.554
-#Mz, My = -34645.28897198964, 119630.64930303364
-#Sz, Sy = 273997.4832727, -75536.84725746
-
 for x in [0.418, 0.544]:
 	Mz, My = MC.Mz(x), MC.My(x)
 	Sz, Sy = MC.Sz(x), MC.Sy(x)

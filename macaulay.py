@@ -5,6 +5,7 @@ from interpolation import get_load
 import numpy as np
 from integration import integrate as S
 import matplotlib.pyplot as plt
+plt.gcf().subplots_adjust(left=0.25)
 
 
 xi, J = None, None
@@ -293,22 +294,40 @@ def alpha(x): #Check!
     angle = math.degrees(alpha)
     return -alpha
 
-def plot_result(f, legend, show_plot=False, dx=0.005):
+def plot_result(f, legend, title, show_plot=False, dx=0.005):
     x = np.arange(0.0, La, dx)
     y = [f(xi) for xi in x]
     plt.plot(x, y)
-    plt.title(f"{legend}(x)")
     if show_plot: plt.show()
-    plt.savefig(f"plots/macaulay/{legend}.pdf")
+    plt.ylabel(title)
+    plt.xlabel("x [m]")
+    plt.savefig(f"plots/macaulay/{legend}.pdf", bbox_inches='tight')
     plt.close()
 
 def do_plots():
-    plot_result(alpha, "alpha")
-    plot_result(w, "w")
-    plot_result(v, "v")
-    plot_result(Sy, "Sy")
-    plot_result(Sz, "Sz")
-    plot_result(T, "T")
-    plot_result(My, "My")
-    plot_result(Mz, "Mz")
+    plot_result(alpha, "alpha", "Twist [rad]")
+    plot_result(w, "w", "Displacement in the XXX")
+    plot_result(v, "v", "Displacement in the XXX")
+    plot_result(Sy, "Sy", "Shear in the y-direction [N]")
+    plot_result(Sz, "Sz", "Shear in the z-direction [N]")
+    plot_result(T, "T", "Torque around x [Nm]")
+    plot_result(My, "My", "Bending moment around z [Nm]")
+    plot_result(Mz, "Mz", "Bending moment around y [Nm]")
 
+    # Plot bendings
+    xs = np.arange(0, 1.691, 0.001)
+    fig, ax1 = plt.subplots()
+    ax1.set_xlabel('x [m]')
+    color = 'tab:red'
+    ax1.set_ylabel('bending moment around z [Nm]', color=color)
+    ax1.plot(xs, [Mz(x) for x in xs], color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+
+    color = 'tab:blue'
+    ax2.set_ylabel('bending moment around y [Nm]', color=color)
+    ax2.plot(xs, [My(x) for x in xs], color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    plt.savefig(f"plots/macaulay/bendings_n.pdf", bbox_inches='tight')
+    plt.close()

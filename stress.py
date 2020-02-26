@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib as mpl
 import math
 
@@ -79,46 +80,29 @@ class stress():
 		z -= self.zc
 		vm = math.sqrt(stress ** 2 / 2 + 3 * (shear / t) ** 2)
 		self.vm_stresses.append([z, y, vm])
-	
-	def plot_stress(self):
-		data = np.array(self.stresses)
+
+	def plot(self, data, fname):
 		z, y, s = data[:,0], data[:,1], data[:,2]
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_aspect('equal')
 		plt.xlim(0.225, -0.325)
-		plt.ylim(-0.09, 0.09)
+		plt.ylim(-0.125, 0.125)
 		plt.xlabel("z [m]")
 		plt.ylabel("y [m]")
-		plt.scatter(z, y, c=s)
-		plt.colorbar()
+		plt.scatter(z, y, c=s, s=3)
+		divider = make_axes_locatable(ax)
+		cax = divider.append_axes("right", size="3%", pad=0.1)
+		plt.colorbar(cax=cax)
 		plt.set_cmap("jet")
-		plt.savefig("plots/stresses/s.pdf")
+		plt.savefig(f"plots/stresses/{fname}.pdf")
 		#z_line = np.arange(-0.2, 0.2, 0.001)
 		#alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
 		#y_line = [z_c * np.sin(alpha) for z_c in z_line]
 		#plt.plot(z_line, y_line)
 		plt.show()
-			
-	def plot_shear_flows(self):
-		data = np.array(self.shear_flows)
-		z, y, s = data[:,0], data[:,1], data[:,2]
-		plt.xlim(0.225, -0.325)
-		plt.ylim(-0.09, 0.09)
-		plt.xlabel("z [m]")
-		plt.ylabel("y [m]")
-		plt.scatter(z, y, c=s)
-		plt.colorbar()
-		plt.set_cmap("jet")
-		plt.savefig("plots/stresses/sf.pdf")
-		plt.show()
-			
-	def plot_vm(self):
-		data = np.array(self.vm_stresses)
-		z, y, s = data[:,0], data[:,1], data[:,2]
-		plt.xlim(0.225, -0.325)
-		plt.ylim(-0.09, 0.09)
-		plt.xlabel("z [m]")
-		plt.ylabel("y [m]")
-		plt.scatter(z, y, c=s)
-		plt.colorbar()
-		plt.set_cmap("jet")
-		plt.savefig("plots/stresses/vm.pdf")
-		plt.show()
+
+	def plot_all(self):
+		self.plot(np.array(self.stresses), "s")
+		self.plot(np.array(self.vm_stresses), "vm")
+		self.plot(np.array(self.shear_flows), "sf")

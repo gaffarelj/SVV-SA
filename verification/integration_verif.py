@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import numpy as np
 from integration import integrate as S
 
+# Unit tests
+
 # Polynomial test
 def f_a(x):
 	return 10 * x**3 - 3 * x**2 - 20

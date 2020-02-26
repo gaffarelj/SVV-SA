@@ -107,7 +107,7 @@ def q_horizontal_3(s3):  # SECTION 3: 0 to l_topskin
         q_booms = 0
         for i in range(8, 8 + nbooms):
             q_booms += sect.stiff_area * sect.boomcoords[i, 0]
-        q_skin = sect.tskin * S(lambda x: x * np.cos(sect.beta) + sect.z_centroid, 0, s3)
+        q_skin = -sect.tskin * S(lambda x: x * np.cos(sect.beta) + sect.z_centroid, 0, s3)
         q = c * (q_skin + q_booms) + q_horizontal_1(np.pi / 2) + q_horizontal_2(sect.r)
     return q
 
@@ -117,8 +117,7 @@ def q_horizontal_4(s4):  # SECTION 4: 0 to l_topskin
     boom1_s4 = (sect.Ca - sect.r + sect.boomcoords_hinge[0, 0]) / np.cos(sect.beta)
     boomspace_s4 = -(sect.boomcoords_hinge[0, 0] - sect.boomcoords_hinge[1, 0]) / np.cos(sect.beta)
     if s4 < boom1_s4:
-        q = c * S(lambda x: sect.tskin * (-(sect.l_spar_to_end + sect.z_centroid) + (x * np.cos(sect.beta))), 0,
-                  s4) + q_horizontal_3(sect.l_topskin)
+        q = c * S(lambda x: sect.tskin * (-(sect.l_spar_to_end + sect.z_centroid) + (x * np.cos(sect.beta))), 0,s4) + q_horizontal_3(sect.l_topskin)
     else:
         nbooms = int((s4 - boom1_s4) / boomspace_s4) + 1
         q_booms = 0
@@ -139,8 +138,7 @@ def q_horizontal_6(theta):  # SECTION 6: -pi/2 to 0
     c = -1 / sect.Iyy
     boom6_theta = np.arcsin(sect.boomcoords[5, 1] / sect.r)
     if theta < boom6_theta:
-        q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
-                                        theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
+        q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2, theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
     elif theta == 0:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
                                          theta) + sect.stiff_area * sect.boomcoords[5, 0] + 0.5 * sect.stiff_area *

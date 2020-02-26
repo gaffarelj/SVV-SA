@@ -1,3 +1,14 @@
 .idea/
 .vs/
 __pycache__/
+/data/Bending_displ.csv
+/data/Bending_result.csv
+/data/Bending_result_dat.csv
+/data/Bending_result_dat.txt
+/data/Bending_result_notext_dat.csv
+/data/Bending_result_notext_nosmallvalues_dat.csv
+/data/Jambent_displ.csv
+/data/Jambent_result.csv
+/data/Jamstraight_displ.csv
+/data/Jamstraight_result2.csv
+/data/jamstraight_results.csv

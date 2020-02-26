@@ -1,6 +1,10 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
 def scatter3d(x,y,z, cs):
     fig = plt.figure()
     ax = Axes3D(fig)
@@ -72,15 +76,15 @@ for j in range(np.shape(elements)[0]):
 
 ######################################### Plotting in 4D #####################################
 
-
-data = data.transpose()
-
-
-scatter3d(data[0],data[1],data[2],data[3])
+#
+# data = data.transpose()
+#
+#
+# scatter3d(data[0],data[1],data[2],data[3])
 
 
 ##################################### plotting  slices with unknown spacing ####################
-'''
+
 next_section = np.unique(data[:,0])
 
 # select a cross section place to monitor the stresses
@@ -88,6 +92,38 @@ next_section = np.unique(data[:,0])
 discr_miss =[]
 discr_shear = []
 xloc = []
+
+lst_x = sorted(list(next_section))
+
+for x in lst_x:
+    section_data = np.zeros((62, 6))
+
+sections = {}  # x:[y,z,vm,ss]
+for element in data:
+    if element[0] in sections:
+        sections[element[0]].append(element[1:])
+    else:
+        sections[element[0]] = [element[1:]]
+
+for x, info in sections.items():
+    if len(info) == 62:
+        section_data = np.zeros((62, 6))
+        for i, item in enumerate(info):
+            section_data[i,0:4] = list(item)
+        section_data = section_data.transpose()
+        local_mse_miss = 1 / 62 * sum((section_data[2] - section_data[4])) ** 2
+        local_mse_shear = 1 / 62 * sum((section_data[3] - section_data[5])) ** 2
+
+        xloc.append(x)
+        discr_miss.append(local_mse_miss)
+        discr_shear.append(local_mse_shear)
+
+print(sum(xloc),sum(discr_miss),sum(discr_shear))
+
+discr_miss =[]
+discr_shear = []
+xloc = []
+
 for numb in range(np.shape(next_section)[0]):
     section_data = np.zeros((62, 6))
 
@@ -135,10 +171,9 @@ for numb in range(np.shape(next_section)[0]):
 
 
 # plot list of error
-
+print(sum(xloc),sum(discr_miss),sum(discr_shear))
 plt.plot(xloc,discr_miss,xloc,discr_shear)
-plt.show()
-'''
+
 
 
 

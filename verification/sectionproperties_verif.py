@@ -1,26 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 20 15:18:36 2020
-
-@author: iybur
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 20 14:05:33 2020
-
-@author: iybur
-"""
-
 import math
 import numpy as np
-"""
-Section Properties - idealized aileron
-Computes the centroid, enclosed area and moments of inertia (Iyy and Izz) for the idealized section.
-All units are meters unless otherwise specified.
-Stiffener positions are hardcoded (frame of reference is the hinge line), more can be added.
-Inputs are below, as given in Aircraft Data, coded for CRJ700.
-"""
+
 
 def get_boomcoords():
     # stiffener positions (origin at hinge line, from bottom right going clockwise, in meters)
@@ -84,7 +64,7 @@ def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
     return Izz_total
 
 
-comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area)
+z_centroid, boomcoords_centroid = comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area)
 print("No AssertionErrors have arised, and the comp_centroid function works correctly")
 comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area)
 print("No AssertionErrors have arised, and the comp_Iyy function works correctly")

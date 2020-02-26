@@ -1,14 +1,13 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import macaulay as MC
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import sectionproperties as SP
 import shearcentre as SC
 import macaulay as MC
-import  torsionstiffness as TS
+import torsionstiffness as TS
 import stress as STR
 
 sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)

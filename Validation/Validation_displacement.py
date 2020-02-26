@@ -22,17 +22,17 @@ Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
 MC.do_plots()
 MC.plot_result(MC.My, "My_b")
 
-path = 'data/nodes.txt'
+path = 'Validation/nodes.txt'
 file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )
 file.close()
 
-path = 'data/elements.txt'
+path = 'Validation/elements.txt'
 file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Displ_jamstraight.csv'
+path = 'Validation/Displ_jamstraight.csv'
 file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
 file.close()

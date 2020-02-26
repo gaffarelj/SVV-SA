@@ -12,7 +12,7 @@ sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, 
 SC.set_sect(sect)
 qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 
-_, _, J = TS.tosionalstiffness(sect)
+_, _, J = TS.torsionalstiffness(sect)
 
 MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
@@ -21,7 +21,8 @@ MC.do_plots()
 for x in [0.418, 0.544]:
 	Mz, My = MC.Mz(x), MC.My(x)
 	Sz, Sy = MC.Sz(x), MC.Sy(x)
-	s = STR.stress(Mz, My, Sz, Sy, sect, q1, q2, q3, q4, q5, q6)
+	T = MC.T(x)
+	s = STR.stress(Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6)
 	s.section_stress()
 	s.plot_all(x)
 

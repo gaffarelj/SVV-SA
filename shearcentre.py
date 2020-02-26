@@ -1,5 +1,6 @@
 from integration import integrate as S
 import sectionproperties as SP
+from torsionstiffness import torsionalstiffness
 import numpy as np
 
 sect = None
@@ -117,7 +118,8 @@ def q_horizontal_4(s4):  # SECTION 4: 0 to l_topskin
     boom1_s4 = (sect.Ca - sect.r + sect.boomcoords_hinge[0, 0]) / np.cos(sect.beta)
     boomspace_s4 = -(sect.boomcoords_hinge[0, 0] - sect.boomcoords_hinge[1, 0]) / np.cos(sect.beta)
     if s4 < boom1_s4:
-        q = c * S(lambda x: sect.tskin * (-(sect.l_spar_to_end + sect.z_centroid) + (x * np.cos(sect.beta))), 0,s4) + q_horizontal_3(sect.l_topskin)
+        q = c * S(lambda x: sect.tskin * (-(sect.l_spar_to_end + sect.z_centroid) + (x * np.cos(sect.beta))), 0,
+                  s4) + q_horizontal_3(sect.l_topskin)
     else:
         nbooms = int((s4 - boom1_s4) / boomspace_s4) + 1
         q_booms = 0
@@ -138,7 +140,8 @@ def q_horizontal_6(theta):  # SECTION 6: -pi/2 to 0
     c = -1 / sect.Iyy
     boom6_theta = np.arcsin(sect.boomcoords[5, 1] / sect.r)
     if theta < boom6_theta:
-        q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2, theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
+        q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
+                                        theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
     elif theta == 0:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
                                          theta) + sect.stiff_area * sect.boomcoords[5, 0] + 0.5 * sect.stiff_area *
@@ -268,33 +271,36 @@ def shear_centre(n):
     xi = -(m1 + m3 + m4 + m6)
 
     # TOTAL EQUATIONS
-    def q1(theta, Sz, Sy):
-        q = q1_v(theta) * Sy + q_horizontal_1(theta) * Sz
+
+    q0I, q0II, _ = torsionalstiffness(sect)
+
+    def q1(theta, Sz, Sy, T):
+        q = q1_v(theta) * Sy + q_horizontal_1(theta) * Sz + T * q0I
         return q
 
-    def q2(s, Sz, Sy):
-        q = q2_v(s) * Sy + q_horizontal_2(s) * Sz
+    def q2(s, Sz, Sy, T):
+        q = q2_v(s) * Sy + q_horizontal_2(s) * Sz + T * (q0II - q0I)
         return q
 
-    def q3(s, Sz, Sy):
-        q = q3_v(s) * Sy + q_horizontal_3(s) * Sz
+    def q3(s, Sz, Sy, T):
+        q = q3_v(s) * Sy + q_horizontal_3(s) * Sz + T * q0II
         return q
 
-    def q4(s, Sz, Sy):
-        q = q4_v(s) * Sy + q_horizontal_4(s) * Sz
+    def q4(s, Sz, Sy, T):
+        q = q4_v(s) * Sy + q_horizontal_4(s) * Sz + T * q0II
         return q
 
-    def q5(s, Sz, Sy):
-        q = q5_v(s) * Sy + q_horizontal_5(s) * Sz
+    def q5(s, Sz, Sy, T):
+        q = q5_v(s) * Sy + q_horizontal_5(s) * Sz + T * (q0I - q0II)
         return -q
 
-    def q6(theta, Sz, Sy):
-        q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz
+    def q6(theta, Sz, Sy, T):
+        q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz + T * q0I
         return q
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+# qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 
 ##Verification
 # our_zc = xi - sect.r

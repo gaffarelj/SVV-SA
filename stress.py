@@ -5,13 +5,14 @@ import matplotlib as mpl
 import math
 
 class stress():
-	def __init__(self, Mz, My, Sz, Sy, sect, q1, q2, q3, q4, q5, q6):
+	def __init__(self, Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6):
 		self.Iyy = sect.Iyy
 		self.Izz = sect.Izz
 		self.Mz = Mz
 		self.My = My
 		self.Sz = Sz
 		self.Sy = Sy
+		self.T = T
 		self.stresses = []
 		self.shear_flows = []
 		self.vm_stresses = []
@@ -32,10 +33,10 @@ class stress():
 			sigma = self.add_stress(z, y)
 			if y > 0:
 				s = y
-				tau = self.add_shear(z, y, s, self.q2, self.Sz, self.Sy)
+				tau = self.add_shear(z, y, s, self.q2, self.Sz, self.Sy, self.T)
 			else:
 				s = -y
-				tau = self.add_shear(z, y, s, self.q5, self.Sz, self.Sy)
+				tau = self.add_shear(z, y, s, self.q5, self.Sz, self.Sy, self.T)
 			self.add_vonMises(y, z, sigma, tau, self.tspar)
 		# Circle
 		for theta in np.arange(0, np.pi, 0.025):
@@ -44,23 +45,23 @@ class stress():
 			sigma = self.add_stress(z, y)
 			s = theta - np.pi / 2
 			if theta < np.pi / 2:
-				tau = self.add_shear(z, y, s, self.q6, self.Sz, self.Sy)
+				tau = self.add_shear(z, y, s, self.q6, self.Sz, self.Sy, self.T)
 			else:
-				tau = self.add_shear(z, y, s, self.q1, self.Sz, self.Sy)
+				tau = self.add_shear(z, y, s, self.q1, self.Sz, self.Sy, self.T)
 			self.add_vonMises(y, z, sigma, tau, self.tskin)
 		# Top sheet
 		for s in np.arange(0, self.l_topskin, 0.0025):
 			z = -s * np.cos(self.beta)
 			y = self.r - s * np.sin(self.beta)
 			sigma = self.add_stress(z, y)
-			tau = self.add_shear(z, y, s, self.q3, self.Sz, self.Sy)
+			tau = self.add_shear(z, y, s, self.q3, self.Sz, self.Sy, self.T)
 			self.add_vonMises(y, z, sigma, tau, self.tskin)
 		# Bottom sheet
 		for s in np.arange(0, self.l_topskin, 0.0025):
 			z = -s * np.cos(self.beta)
 			y = -self.r + s * np.sin(self.beta)
 			sigma = self.add_stress(z, y)
-			tau = self.add_shear(-z - self.l_spar_to_end, -y - self.r, s, self.q4, self.Sz, self.Sy)
+			tau = self.add_shear(-z - self.l_spar_to_end, -y - self.r, s, self.q4, self.Sz, self.Sy, self.T)
 			self.add_vonMises(y, z, sigma, tau, self.tskin)
 
 	def add_stress(self, z, y):
@@ -69,9 +70,9 @@ class stress():
 		self.stresses.append([z, y, strs])
 		return strs
 
-	def add_shear(self, z, y, s, q, Sz, Sy):
+	def add_shear(self, z, y, s, q, Sz, Sy, T):
 		z -= self.zc
-		shear = q(s, Sz, Sy)
+		shear = q(s, Sz, Sy, T)
 		self.shear_flows.append([z, y, shear])
 		return shear
 

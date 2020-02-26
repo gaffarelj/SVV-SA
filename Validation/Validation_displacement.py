@@ -22,24 +22,24 @@ Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
 MC.do_plots()
 MC.plot_result(MC.My, "My_b")
 
-path = 'data/nodes.txt'
+path = 'Validation/nodes.txt'
 file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )
 file.close()
 
-path = 'data/elements.txt'
+path = 'Validation/elements.txt'
 file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Displ_jamstraight.csv'
+path = 'Validation/Displ_jamstraight.csv'
 file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
 file.close()
 
 
 # find all nodes that lie on the hingeline (0,0) in zy plane
-hingeline = np.zeros((np.size(np.unique(nodes[:,1])),4))
+hingeline = np.zeros((np.size(np.unique(nodes[:,1])),5))
 original = np.zeros((np.size(np.unique(nodes[:,1])),3))
 
 k=0
@@ -52,8 +52,9 @@ for i in range(np.shape(nodes)[0]):
         k += 1
 
 # get out the displacement per node
+# the 5th element in hingeline row is the total magnitude of the displacement
 for i in range(np.shape(hingeline)[0]):
-    #hingeline[i,1] = hingeline[i,1] #+ displ_dat[int(hingeline[i,0]),2]
+    hingeline[i,4] = displ_dat[int(hingeline[i,0]),1]
     hingeline[i,2] = displ_dat[int(hingeline[i,0]),3]
     hingeline[i,3] = displ_dat[int(hingeline[i,0]),4]
 
@@ -70,11 +71,24 @@ for i in range(np.shape(x_coords)[0]):
     disp_num[i,1] = MC.v(x_coords[i])
     disp_num[i,2] = MC.w(x_coords[i])
 
-disp_num = disp_num
 
+
+# compute total Magnitude of displ
+
+mag_val = hingeline[:,4]/1000
+
+mag_num = ((disp_num[:,1])**2 + (disp_num[:,2]**2))**0.5
+
+print(mag_val)
+print(mag_num)
+# setup MSE
+
+MSE = 1/np.shape(disp_num)[0] * sum(mag_num-mag_val)**2
+print(MSE)
+
+'''
 hingeline = hingeline.transpose()
 disp_num = disp_num.transpose()
-
 
 fig = plt.figure()
 
@@ -88,3 +102,4 @@ ax.set_zlabel('Z axis')
 #ax.set_ylim3d(-10,10)
 #ax.set_zlim3d(-10, 10)
 plt.show()
+'''

@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
@@ -19,7 +20,7 @@ def scatter3d(x,y,z, cs):
 
 # starting to couple every element with 4 points.
 ######################################## loading data ##########################################
-path = 'data/nodes.txt'
+path = os.path.relpath('data/nodes.txt', os.path.dirname(__file__))
 file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )
 file.close()

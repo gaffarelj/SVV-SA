@@ -1,4 +1,4 @@
-def integrate(f, a, b, dx=1e-4):
+def integrate(f, a, b, dx=1e-2):
 	n = int((b - a) / dx)
 	area = 0
 	for i in range(1, n):

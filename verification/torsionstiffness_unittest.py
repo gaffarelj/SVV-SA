@@ -54,4 +54,4 @@ print ('sectionprop', sect.tskin)
 print ('torsstif', J)
 discr = ((J-J_original)/J_original)*100
 diff = J/J_original
-print ('increas see' diff)
+print ('increase see' diff)

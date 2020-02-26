@@ -33,9 +33,9 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'Validation/Displ_jamstraight.csv'
+path = 'Validation/Jambent_displ.csv'
 file = open(path, "r")
-displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
+displ_dat = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
 
@@ -52,18 +52,24 @@ for i in range(np.shape(nodes)[0]):
         hingeline[k,1] = nodes[i,1]
         k += 1
 
+
+
+
 # get out the displacement per node
 # the 5th element in hingeline row is the total magnitude of the displacement
+
 for i in range(np.shape(hingeline)[0]):
     hingeline[i,4] = displ_dat[int(hingeline[i,0]),1]
     hingeline[i,2] = displ_dat[int(hingeline[i,0]),3]
     hingeline[i,3] = displ_dat[int(hingeline[i,0]),4]
 
+
+
 x_coords = hingeline[:,1]/1000
 
 # change units to m instead of mm
 
-hingeline = hingeline/1000
+hingeline = hingeline
 disp_num = np.zeros((np.shape(x_coords)[0],3))
 disp_num[:,0] = x_coords
 
@@ -72,24 +78,20 @@ for i in range(np.shape(x_coords)[0]):
     disp_num[i,1] = MC.v(x_coords[i])
     disp_num[i,2] = MC.w(x_coords[i])
 
-
-
-# compute total Magnitude of displ
-
-mag_val = hingeline[:,4]/1000
-
-mag_num = ((disp_num[:,1])**2 + (disp_num[:,2]**2))**0.5
-
-print(mag_val)
-print(mag_num)
-# setup MSE
-
-MSE = 1/np.shape(disp_num)[0] * sum(mag_num-mag_val)**2
-print(MSE)
-
-'''
 hingeline = hingeline.transpose()
 disp_num = disp_num.transpose()
+# compute total Magnitude of displ
+print(hingeline[4])
+mag_num = ((disp_num[1])**2 + (disp_num[2]**2))**0.5
+
+# setup MSE
+
+
+MSE = 1/np.shape(disp_num)[0] * sum((mag_num-hingeline[4]/1000)**2)
+print(MSE)
+
+
+
 
 fig = plt.figure()
 
@@ -103,4 +105,3 @@ ax.set_zlabel('Z axis')
 #ax.set_ylim3d(-10,10)
 #ax.set_zlim3d(-10, 10)
 plt.show()
-'''

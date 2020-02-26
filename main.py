@@ -21,7 +21,7 @@ _, _, J = TS.tosionalstiffness(sect)
 x = 0.554
 #Mz, My = MC.Mz(x)[0], MC.My(x)[0]
 Mz, My = -34645.28897198964, 119630.64930303364
-Sz, Sy = -100000, 40000
+Sz, Sy = 300000, -90000
 
 s = STR.stress(Mz, My, Sz, Sy, sect, q1, q2, q3, q4, q5, q6)
 s.section_stress()

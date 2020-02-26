@@ -81,7 +81,8 @@ def q_horizontal_1(theta):  # SECTION 1: 0 to pi/2
     c = -1 / sect.Iyy
     boom8_theta = np.arcsin(sect.boomcoords[7, 1] / sect.r)
     if theta < boom8_theta:
-        q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, 0, theta)
+        q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, 0,
+                                         theta) + 0.5 * sect.stiff_area * sect.boomcoords[6, 0])
     else:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, 0, theta) + sect.stiff_area *
                  sect.boomcoords[7, 0])
@@ -140,6 +141,10 @@ def q_horizontal_6(theta):  # SECTION 6: -pi/2 to 0
     if theta < boom6_theta:
         q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
                                         theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
+    elif theta == 0:
+        q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
+                                         theta) + sect.stiff_area * sect.boomcoords[5, 0] + 0.5 * sect.stiff_area *
+                 sect.boomcoords[6, 0]) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
     else:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
                                          theta) + sect.stiff_area * sect.boomcoords[5, 0]) + q_horizontal_5(
@@ -283,7 +288,7 @@ def shear_centre(n):
 
     def q5(s, Sz, Sy):
         q = q5_v(s) * Sy + q_horizontal_5(s) * Sz
-        return q
+        return -q
 
     def q6(theta, Sz, Sy):
         q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz
@@ -291,7 +296,8 @@ def shear_centre(n):
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-# qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+
 ##Verification
 # our_zc = xi - sect.r
 # print("our zc:", our_zc)

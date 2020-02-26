@@ -83,7 +83,7 @@ class stress():
 		vm = math.sqrt(stress ** 2 / 2 + 3 * (shear / t) ** 2)
 		self.vm_stresses.append([z, y, vm])
 
-	def plot(self, data, fname, label):
+	def plot(self, data, fname, label, x):
 		z, y, s = data[:,0], data[:,1], data[:,2]
 		fig = plt.figure()
 		ax = fig.add_subplot(111)
@@ -97,14 +97,14 @@ class stress():
 		cax = divider.append_axes("right", size="3%", pad=0.1)
 		plt.colorbar(cax=cax, label=label)
 		plt.set_cmap("jet")
-		plt.savefig(f"plots/stresses/{fname}.pdf")
+		plt.savefig(f"plots/stresses/{fname}-{str(x).replace('.', '-')}.pdf")
 		#z_line = np.arange(-0.2, 0.2, 0.001)
 		#alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
 		#y_line = [z_c * np.sin(alpha) for z_c in z_line]
 		#plt.plot(z_line, y_line)
 		plt.show()
 
-	def plot_all(self):
-		self.plot(np.array(self.stresses), "s", "Normal stress")
-		self.plot(np.array(self.vm_stresses), "vm", "von Mises stress")
-		self.plot(np.array(self.shear_flows), "sf", "Shear flow")
+	def plot_all(self, x):
+		self.plot(np.array(self.stresses), "s", "Normal stress", x)
+		self.plot(np.array(self.vm_stresses), "vm", "von Mises stress", x)
+		self.plot(np.array(self.shear_flows), "sf", "Shear flow", x)

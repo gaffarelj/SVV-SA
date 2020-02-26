@@ -84,7 +84,7 @@ def q_horizontal_1(theta):  # SECTION 1: 0 to pi/2
         q = c * sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, 0, theta)
     else:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, 0, theta) + sect.stiff_area *
-                 sect.boomcoords_centroid[7, 0])
+                 sect.boomcoords[7, 0])
     return q
 
 
@@ -105,7 +105,7 @@ def q_horizontal_3(s3):  # SECTION 3: 0 to l_topskin
         nbooms = int((s3 - boom9_s3) // boomspace_s3) + 1
         q_booms = 0
         for i in range(8, 8 + nbooms):
-            q_booms += sect.stiff_area * sect.boomcoords_centroid[i, 0]
+            q_booms += sect.stiff_area * sect.boomcoords[i, 0]
         q_skin = sect.tskin * S(lambda x: x * np.cos(sect.beta) + sect.z_centroid, 0, s3)
         q = c * (q_skin + q_booms) + q_horizontal_1(np.pi / 2) + q_horizontal_2(sect.r)
     return q
@@ -122,7 +122,7 @@ def q_horizontal_4(s4):  # SECTION 4: 0 to l_topskin
         nbooms = int((s4 - boom1_s4) / boomspace_s4) + 1
         q_booms = 0
         for i in range(0, 0 + nbooms):
-            q_booms += sect.stiff_area * sect.boomcoords_centroid[i, 0]
+            q_booms += sect.stiff_area * sect.boomcoords[i, 0]
         q_skin = S(lambda x: sect.tskin * (-(sect.l_spar_to_end + sect.z_centroid) + (x * np.cos(sect.beta))), 0, s4)
         q = c * (q_skin + q_booms) + q_horizontal_3(sect.l_topskin)
     return q
@@ -142,7 +142,7 @@ def q_horizontal_6(theta):  # SECTION 6: -pi/2 to 0
                                         theta) + q_horizontal_5(sect.r) + q_horizontal_4(sect.l_topskin)
     else:
         q = c * (sect.tskin * sect.r * S(lambda x: sect.r * np.cos(x) - sect.z_centroid, -np.pi / 2,
-                                         theta) + sect.stiff_area * sect.boomcoords_centroid[5, 0]) + q_horizontal_5(
+                                         theta) + sect.stiff_area * sect.boomcoords[5, 0]) + q_horizontal_5(
             sect.r) + q_horizontal_4(sect.l_topskin)
     return q
 
@@ -265,27 +265,27 @@ def shear_centre(n):
     xi = -(m1 + m3 + m4 + m6)
 
     # TOTAL EQUATIONS
-    def q1(theta, Sy, Sz):
+    def q1(theta, Sz, Sy):
         q = q1_v(theta) * Sy + q_horizontal_1(theta) * Sz
         return q
 
-    def q2(s, Sy, Sz):
+    def q2(s, Sz, Sy):
         q = q2_v(s) * Sy + q_horizontal_2(s) * Sz
         return q
 
-    def q3(s, Sy, Sz):
+    def q3(s, Sz, Sy):
         q = q3_v(s) * Sy + q_horizontal_3(s) * Sz
         return q
 
-    def q4(s, Sy, Sz):
+    def q4(s, Sz, Sy):
         q = q4_v(s) * Sy + q_horizontal_4(s) * Sz
         return q
 
-    def q5(s, Sy, Sz):
+    def q5(s, Sz, Sy):
         q = q5_v(s) * Sy + q_horizontal_5(s) * Sz
         return q
 
-    def q6(theta, Sy, Sz):
+    def q6(theta, Sz, Sy):
         q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz
         return q
 

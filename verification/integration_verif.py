@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import numpy as np
 from integration import integrate as S
 
+# Unit tests
+
 # Polynomial test
 def f_a(x):
 	return 10 * x**3 - 3 * x**2 - 20
@@ -41,7 +43,7 @@ def f_e(x):
 	return 4 * np.log(x) + 3
 S_e1 = S(f_e, 1, 50, dx=0.1)
 S_e2 = S(f_e, 1, 50, dx=0.001)
-S_e = 401.6722824
+S_e = 733.4046011
 print("log", S_e, (S_e1-S_e)/S_e*100, (S_e2-S_e)/S_e*100)
 
 # Linear test

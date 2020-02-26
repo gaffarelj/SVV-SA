@@ -1,26 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 20 15:18:36 2020
-
-@author: iybur
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 20 14:05:33 2020
-
-@author: iybur
-"""
-
 import math
 import numpy as np
-"""
-Section Properties - idealized aileron
-Computes the centroid, enclosed area and moments of inertia (Iyy and Izz) for the idealized section.
-All units are meters unless otherwise specified.
-Stiffener positions are hardcoded (frame of reference is the hinge line), more can be added.
-Inputs are below, as given in Aircraft Data, coded for CRJ700.
-"""
+
 
 def get_boomcoords():
     # stiffener positions (origin at hinge line, from bottom right going clockwise, in meters)
@@ -66,6 +46,7 @@ def comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area):
         Iyy_booms += ((boomcoords[i, 0]) ** 2) * stiff_area
     Iyy_total = 2 * Iyy_thin + Iyy_spar + Iyy_ring + Iyy_booms
     if round(Iyy_total, 3) != 307.997:         #Here the Iyy is rounded to 3 digits. 
+        print(Iyy_total)
         raise AssertionError                    #If the Iyy_total is not equal to algebraically calculated value, the assertionerror is raised
     return Iyy_total
 
@@ -80,11 +61,12 @@ def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
         Izz_booms += (boomcoords[i, 1]) ** 2 * stiff_area
     Izz_total = 2 * Izz_thin + Izz_spar + Izz_ring + Izz_booms
     if round(Izz_total, 3) != 2.437:         #Here the Izz is rounded to 3 digits. 
+        print(Izz_total)
         raise AssertionError                    #If the Izz_total is not equal to algebraically calculated value, the assertionerror is raised
     return Izz_total
 
 
-comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area)
+z_centroid, boomcoords_centroid = comp_centroid(Ha, tskin, tspar, boomcoords, stiff_area)
 print("No AssertionErrors have arised, and the comp_centroid function works correctly")
 comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area)
 print("No AssertionErrors have arised, and the comp_Iyy function works correctly")

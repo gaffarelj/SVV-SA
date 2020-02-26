@@ -1,101 +1,66 @@
-import math
-import numpy as np
+import sys
+import os.path
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+import interpolation as I
+
+# Unit tests
+
+print("interp_two_points")
+
+unittest_interp = I.interp_two_points(1., 0., 2., 50., 100.)
+print(75, unittest_interp)
+
+unittest_interp = I.interp_two_points(-50, -100, 100., 100., -100.)
+print(50, unittest_interp)
 
 
-def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
-	"""
-	Interpolate the load between two points.
-	Point a is before the new coordinate, point b after.
-	"""
-	if point_a == point_b:	# Make sure point a is different to point b (no zero division)
-		return load_a
-	# The load at the new coordinate is interpolated by fitting a line to the known
-	# load before and after that new coordinate
-	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
+print("comp_theta")
 
-unittest_interp = interp_two_points(1., 0., 2., 50., 100.)        #testing interpolation function with point (0,50) and (2,100) and checking whether it gives 75
-if unittest_interp != 75.0:
-    raise AssertionError
-    
-unittest_interp = interp_two_points(-50, -100, 100., 100., -100.)   #testing interpolation function with positive and negative values and testing whether the correct analytically found answer is given
-if unittest_interp != 50.:
-    raise AssertionError
+unittest_theta = I.comp_theta(5, 5)
+analytical_theta = 2.513274123
+print(analytical_theta, unittest_theta, analytical_theta-unittest_theta)
 
-print("No AssertionErrors have arised, and the interp_two_points function works correctly")
+unittest_theta = I.comp_theta(10, 1200)
+analytical_theta = 0.0235619449
+print(analytical_theta, unittest_theta, analytical_theta-unittest_theta)
 
 
-def comp_theta(i, N):
-	"""
-	Compute angle theta, as specified in the Assignment PDF.
-	"""
-	return (i - 1) / N * math.pi
+print("comp_coord")
 
-unittest_theta = comp_theta(5, -5)        #testing theta function with point i = 5 and N = -5 and checking whether it gives -2.51
-if round(unittest_theta, 2) != -2.51:
-    raise AssertionError
-    
-unittest_theta = comp_theta(10, 1200)        #testing theta function with point i = 5 and N = -5 and checking whether it gives -2.51
-if round(unittest_theta, 2) != 0.02:
-    raise AssertionError
+unittest_coord = I.comp_coord(10, 1200, 10, "z")
+analytical_coord = -0.0015506
+print(analytical_coord, unittest_coord, analytical_coord-unittest_coord)
 
-print("No AssertionErrors have arised, and the comp_theta function works correctly")
-
-def comp_coord(i, N, l, c_type):
-	"""
-	Compute the coordinate, accordingly to the Assignment PDF.
-	Inputs:
-		- i: index of the row/column
-		- N: total number of rows/columns
-		- l: chord/span lenght
-	Both computation for x and z coordinates have been combined in this function.
-	"""
-	theta = comp_theta(i, N)
-	theta_1 = comp_theta(i + 1, N)
-	f = -1 if c_type == "z" else 1
-	coord = f / 2 * (l / 2 * (1 - math.cos(theta)) + l / 2 * (1 - math.cos(theta_1)))
-	return coord
-
-unittest_coord = comp_coord(10, 1200, 10, "z")        #testing coordinate function with point i = 10 and N = 1200, l = 10 and c_type = z and checking whether it gives -0.0016
-if round(unittest_coord, 4) != -0.0016:
-    raise AssertionError
-    
-unittest_coord = comp_coord(10, 1200, 10, 5)        #testing coordinate function with point i = 10 and N = 1200, l = 10 and c_type = else and checking whether it gives 0.0016
-if round(unittest_coord, 4) != 0.0016:
-    raise AssertionError
-
-print("No AssertionErrors have arised, and the comp_coord function works correctly")
+unittest_coord = I.comp_coord(10, 500, 10, "x")
+analytical_coord = 0.0089293
+print(analytical_coord, unittest_coord, analytical_coord-unittest_coord)
 
 
+print("interp_coords")
+
+N, l, c_type = 5, 3, "z"
+coords = [1, 2, 3, 4, 5]
+coords = [I.comp_coord(i, N, l , c_type) for i in coords]
+unittest_interp_coords = I.interp_coords(coords, 20, N, l, c_type)
+plt.plot(coords, np.zeros(len(coords)), marker="x", linewidth=0.5, label="Given")
+plt.plot(unittest_interp_coords, np.ones(len(unittest_interp_coords)), marker="x", linewidth=0.5, label="Interpolated")
+plt.legend()
+plt.xlabel("z [m]")
+plt.yticks([], [])
+plt.show()
+
+N, l, c_type = 5, 10, "x"
+coords = [1, 2, 3, 4, 5]
+coords = [I.comp_coord(i, N, l , c_type) for i in coords]
+unittest_interp_coords = I.interp_coords(coords, 15, N, l, c_type)
+plt.plot(coords, np.zeros(len(coords)), marker="x", linewidth=0.5)
+plt.plot(unittest_interp_coords, np.ones(len(unittest_interp_coords)), marker="x", linewidth=0.5)
+plt.show()
 
 
-def interp_coords(coordinates, n, N, l, c_type):
-	"""
-	Interpolate the new coordinates for interpolation (in one direction), between the existing ones.
-	Inputs:
-		- coordinates: existing coordinates
-		- n: number of new coordinates specified for interpolation
-		- N: number of existing coordinates
-		- l: length of the span or chord
-		- c_type: coordinate type/direction: "x" or "z"
-	"""
-	n = max(2, n)						# Make sure there is at least two points for the interpolation
-	mesh_size = N / n					# Compute the mesh size: existing number of coord. / specified for interp.
-	mesh_coords = [coordinates[0]]		# Set first interp. coord. as the first existing one
-	for i in range(1, n-1):				# Compute new interp. coord. 
-		mesh_i = i * mesh_size			# Fake row/column index = mesh size * step
-		mesh_coord = comp_coord(mesh_i, N, l, c_type)	# Compute the actual coordinate, as from row/column index
-		mesh_coords.append(mesh_coord)
-	mesh_coords.append(coordinates[-1])	# Set last interp. coord. as the last existing one
-	return mesh_coords
+# Subsystem test
 
-
-unittest_interp_coords = interp_coords([1,2], 1, 1, 1, "z")        
-    raise AssertionError
-    
-unittest_interp_coords = interp_coords([1,2], 3, 3, 3, "x")        
-if unittest_interp_coords != [1, 0.3749999999999999, 2]:
-    raise AssertionError
-
-print("No AssertionErrors have arised, and the comp_coord function works correctly")
+I.get_load(n_span=None, n_chord=None, do_plot=True)
+I.get_load(n_span=100, n_chord=150, do_plot=True)

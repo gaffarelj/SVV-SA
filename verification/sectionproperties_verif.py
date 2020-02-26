@@ -45,8 +45,7 @@ def comp_Iyy(tskin, beta, z_centroid, tspar, Ha, boomcoords, stiff_area):
     for i in range(len(boomcoords)):
         Iyy_booms += ((boomcoords[i, 0]) ** 2) * stiff_area
     Iyy_total = 2 * Iyy_thin + Iyy_spar + Iyy_ring + Iyy_booms
-    if round(Iyy_total, 3) != 307.997:         #Here the Iyy is rounded to 3 digits. 
-        print(Iyy_total)
+    if round(Iyy_total, 3) != 162.201:         #Here the Iyy is rounded to 3 digits. 
         raise AssertionError                    #If the Iyy_total is not equal to algebraically calculated value, the assertionerror is raised
     return Iyy_total
 
@@ -60,7 +59,7 @@ def comp_Izz(tskin, beta, tspar, Ha, boomcoords, stiff_area):
     for i in range(len(boomcoords)):
         Izz_booms += (boomcoords[i, 1]) ** 2 * stiff_area
     Izz_total = 2 * Izz_thin + Izz_spar + Izz_ring + Izz_booms
-    if round(Izz_total, 3) != 2.437:         #Here the Izz is rounded to 3 digits. 
+    if round(Izz_total, 1) != 2.4:         #Here the Izz is rounded to 1 digit. 
         print(Izz_total)
         raise AssertionError                    #If the Izz_total is not equal to algebraically calculated value, the assertionerror is raised
     return Izz_total

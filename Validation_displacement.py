@@ -65,9 +65,9 @@ for i in range(np.shape(hingeline)[0]):
 
 x_coords = hingeline[:,1]/1000
 
+
 # change units to m instead of mm
 
-hingeline = hingeline
 disp_num = np.zeros((np.shape(x_coords)[0],3))
 disp_num[:,0] = x_coords
 
@@ -78,15 +78,16 @@ for i in range(np.shape(x_coords)[0]):
 
 hingeline = hingeline.transpose()
 disp_num = disp_num.transpose()
-# compute total Magnitude of displ
-#print(hingeline[4])
+
+
+# compute total Magnitude of displ of the numerical model
+
 mag_num = ((disp_num[1])**2 + (disp_num[2]**2))**0.5
 
 # setup MSE
 
-
 MSE = 1/np.shape(disp_num)[0] * sum((mag_num-hingeline[4]/1000)**2)
-print(MSE)
+print("MSE = ",MSE)
 
 
 
@@ -94,12 +95,9 @@ print(MSE)
 fig = plt.figure()
 
 ax = Axes3D(fig)
-ax.scatter(hingeline[1]/1000,hingeline[3]/1000,hingeline[2]/1000)
-ax.scatter(disp_num[0],disp_num[1],disp_num[2])
+ax.scatter(hingeline[1]/1000,-1*hingeline[2]/1000,-1*hingeline[3]/1000)
+ax.scatter(disp_num[0],-1*disp_num[1],-1*disp_num[2])
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
-#ax.set_xlim3d(0, 2500)
-#ax.set_ylim3d(-10,10)
-#ax.set_zlim3d(-10, 10)
 plt.show()

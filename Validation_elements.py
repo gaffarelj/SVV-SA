@@ -128,20 +128,9 @@ def get_stresses(x,y,z):  # all inputs are mm
     vmss = numericaldata[x/1000]
     distance = np.sum((vmss[:, 0:2] - np.array([z/1000, y/1000])) ** 2, axis=1)
     indice = np.argmin(distance)
-    print(x, y, z, vmss[indice,2:])
+    print(x, y, z, vmss[indice, 2:])
     return vmss[indice, 2:]
 
-
-# def find_stress(x,y,z):
-#     s = STR.stress(MC.Mz(x), MC.My(x), MC.Sz(x), MC.Sy(x), MC.T(x), sect, q1, q2, q3, q4, q5, q6, show_plot=False)
-#     s.section_stress()
-#     vm = np.array(s.vm_stresses)
-#     ss = np.array(s.shear_stress)
-#     # vmss = np.concatenate((vm, ss[:, -1].reshape(522,1)), axis=1)
-#     distance = np.sum((vm[:, 0:2] - np.array([z, y]))**2, axis=1)
-#     indice = np.argmin(distance)
-#     print(x,y,z,vm[indice,-1],ss[indice,-1])
-#     return [vm[indice, -1], ss[indice, -1]]
 
 for x in lst_x:
     section_data = np.zeros((62, 6))
@@ -162,8 +151,9 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
             section_data[i,0:4] = list(item)
             section_data[i,4:] = get_stresses(x, item[0], item[1])
         section_data = section_data.transpose()
-        local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2] - section_data[4]*10**9)])
-        local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3] - section_data[5]*10**9)])
+        print(section_data[2:4])
+        local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2] - section_data[4]*10**6)])
+        local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3] - section_data[5]*10**6)])
 
         xloc.append(round(x,6))
         # print(local_mse_miss,local_mse_shear)

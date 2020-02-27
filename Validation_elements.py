@@ -156,8 +156,8 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
         section_data = section_data.transpose()
         #local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2]*10**6/1e9 - section_data[4]/1e9)])
         #local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3]*10**6/1e9 - section_data[5]/1e9)])
-        local_mse_miss = sum(section_data[2]*10**6/1e9 - section_data[4]/1e9)/len(section_data[2])
-        local_mse_shear = sum(section_data[3]*10**6/1e9 - section_data[5]/1e9)/len(section_data[3])
+        local_mse_miss = sum(np.abs(section_data[2]*10**6/1e9 - section_data[4]/1e9))/len(section_data[2])
+        local_mse_shear = sum(np.abs(section_data[3]*10**6/1e9 - section_data[5]/1e9))/len(section_data[3])
 
         xloc.append(round(x,6))
         # print(local_mse_miss,local_mse_shear)

@@ -106,6 +106,6 @@ class stress():
 		plt.show()
 
 	def plot_all(self, x):
-		self.plot(np.array(self.stresses), "s", "Normal stress", x)
-		self.plot(np.array(self.vm_stresses), "vm", "von Mises stress", x)
-		self.plot(np.array(self.shear_flows), "sf", "Shear flow", x)
+		self.plot(np.array(self.stresses), "s", "Normal stress [Pa]", x)
+		self.plot(np.array(self.vm_stresses), "vm", "von Mises stress [Pa]", x)
+		self.plot(np.array(self.shear_flows), "sf", "Shear flow [N/m]", x)

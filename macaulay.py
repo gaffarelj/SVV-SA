@@ -17,6 +17,7 @@ theta, P = None, None
 Izz, Iyy = None, None
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = None, None, None, None, None, None, None, None, None, None, None, None
 f2, f3, f5, fq, fd = None, None, None, None, None
+load = None
 
 
 # MACAULAY
@@ -158,7 +159,12 @@ def coefficients_tau(power=6, chord_steps=300, span_steps=150):
     return a
 
 def q_aero(x, chord_steps=300, span_steps=150):  # x goes from 0 to span steps-1
-    section_coordinates, section_loads = get_load(n_chord=chord_steps, n_span=span_steps, do_plot=False)
+    global load
+    if load is None:
+        section_coordinates, section_loads = get_load(n_chord=chord_steps, n_span=span_steps, do_plot=False)
+        load = section_coordinates, section_loads
+    else:
+        section_coordinates, section_loads = load
     int_x = np.zeros((1, 3))
     sum_chord = 0
     sum_moments = 0

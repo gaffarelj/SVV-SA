@@ -83,7 +83,7 @@ class stress():
 
 	def add_vonMises(self, y, z, stress, q, t):
 		z -= self.zc
-		shear_stress = q[0] / t
+		shear_stress = q / t
 		vm = math.sqrt(stress ** 2  + 3 * shear_stress ** 2)
 		self.vm_stresses.append([z, y, vm])
 		self.shear_stress.append([z, y, shear_stress])

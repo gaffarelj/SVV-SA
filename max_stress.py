@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 plt.tight_layout()
 
-def get_max(Mz_f, My_f, Sz_f, Sy_f, sect, q1, q2, q3, q4, q5, q6, do_plot=False, dx=0.001):
+def get_max(Mz_f, My_f, Sz_f, Sy_f, T_f, sect, q1, q2, q3, q4, q5, q6, do_plot=False, dx=0.001):
 	max_s, max_q, max_vm = float("-Inf"), float("-Inf"), float("-Inf")
 	max_s_x, max_q_x, max_vm_x = None, None, None
 	xs = np.arange(0, 1.691, dx)
@@ -12,7 +12,8 @@ def get_max(Mz_f, My_f, Sz_f, Sy_f, sect, q1, q2, q3, q4, q5, q6, do_plot=False,
 		print(f"Computing stress for x = {round(x, 3)}", end="\r")
 		Mz, My = Mz_f(x), My_f(x)
 		Sz, Sy = Sz_f(x), Sy_f(x)
-		s = STR.stress(Mz, My, Sz, Sy, sect, q1, q2, q3, q4, q5, q6)
+		T = T_f(x)
+		s = STR.stress(Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6)
 		s.section_stress()
 		data = np.array(s.stresses)
 		str = (data[:,2].flatten()).max()

@@ -16,12 +16,12 @@ SC.set_sect(sect)
 #qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 xi = -0.007513567161803937
 
-_, _, J = TS.tosionalstiffness(sect)
+_, _, J = TS.torsionalstiffness(sect)
 
 MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
 MC.do_plots()
-MC.plot_result(MC.My, "My_b")
+#MC.plot_result(MC.My, "My_b")
 
 path = 'Validation/nodes.txt'
 file = open(path, "r")
@@ -53,8 +53,6 @@ for i in range(np.shape(nodes)[0]):
         k += 1
 
 
-
-
 # get out the displacement per node
 # the 5th element in hingeline row is the total magnitude of the displacement
 
@@ -81,7 +79,7 @@ for i in range(np.shape(x_coords)[0]):
 hingeline = hingeline.transpose()
 disp_num = disp_num.transpose()
 # compute total Magnitude of displ
-print(hingeline[4])
+#print(hingeline[4])
 mag_num = ((disp_num[1])**2 + (disp_num[2]**2))**0.5
 
 # setup MSE
@@ -96,7 +94,7 @@ print(MSE)
 fig = plt.figure()
 
 ax = Axes3D(fig)
-ax.scatter(hingeline[1],hingeline[3],hingeline[2])
+ax.scatter(hingeline[1]/1000,hingeline[3]/1000,hingeline[2]/1000)
 ax.scatter(disp_num[0],disp_num[1],disp_num[2])
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')

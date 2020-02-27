@@ -39,10 +39,10 @@ _, _, J = TS.torsionalstiffness(sect)
 
 load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
 
-MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=27.1e9, E_i=73.1e9, 
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=28e9, E_i=73.1e9, 
             La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=0.01154, 
             d3_i=0.0184, xa_i=0.35, theta_i=np.radians(28), P_i=97.4e3)
-Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system(power=0)
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system(power=0, power_t=2)
 MC.do_plots()
 path = 'Validation/nodes.txt'
 file = open(path, "r")

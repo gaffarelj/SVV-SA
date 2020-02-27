@@ -30,7 +30,7 @@ def set_vars(xi_i, J_i, r_i, Izz_i, Iyy_i, G_i=28e9, E_i=73.1e9, La_i=1.691,
 
 # Solve for unknowns
 # Unknowns are, in order, [Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5]
-def system(power=10):
+def system(power=10, power_t=6):
     global Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
     global f2, f3, f5, fq, fd
     print("Macaulay:")
@@ -54,7 +54,10 @@ def system(power=10):
     eq2 = np.array([(La - x1), (La - x2), (La - x3), 0, 0, 0, math.sin(theta) * (La - (x2 - (xa / 2))), 0, 0, 0, 0, 0])
     res2 = np.array([P * math.sin(theta) * (La - (x2 + (xa / 2))) + integral2])
     
-    f3 = lambda x: b[0, 0] + b[1, 0] * x + b[2, 0] * x ** 2 + b[3, 0] * x ** 3 + b[4, 0] * x ** 4 + b[5, 0] * x ** 5 + b[
+    if power_t == 2:
+        f3 = lambda x: b[0, 0] + b[1, 0] * x
+    else:
+        f3 = lambda x: b[0, 0] + b[1, 0] * x + b[2, 0] * x ** 2 + b[3, 0] * x ** 3 + b[4, 0] * x ** 4 + b[5, 0] * x ** 5 + b[
         6, 0] * x ** 6
     integral3 = S(f3, 0, La)
     eq3 = np.array([-xi * (La - x1), -xi * (La - x2), -xi * (La - x3), 0, 0, 0,
@@ -85,10 +88,13 @@ def system(power=10):
                    new_cq[8, 0] * x ** 11 + new_cq[9, 0] * x ** 12 + new_cq[10, 0] * x ** 13
 
     # Double tau function
-    new_ct = np.zeros((7, 1))
-    for i in range(7):
+    new_ct = np.zeros((power_t+1, 1))
+    for i in range(power_t+1):
         new_ct[i, 0] = b[i, 0] / (i + 1)
-    fd = lambda x: new_ct[0, 0] * x + new_ct[1, 0] * x ** 2 + new_ct[2, 0] * x ** 3 + new_ct[3, 0] * x ** 4 + new_ct[
+    if power_t == 2:
+        fd = lambda x: new_ct[0, 0] * x + new_ct[1, 0] * x ** 2
+    else:
+        fd = lambda x: new_ct[0, 0] * x + new_ct[1, 0] * x ** 2 + new_ct[2, 0] * x ** 3 + new_ct[3, 0] * x ** 4 + new_ct[
         4, 0] * x ** 5 + new_ct[5, 0] * x ** 6 + new_ct[6, 0] * x ** 7
     
     eq6 = np.array([0, 0, 0, 0, 0, 0, 0, x1, 1, 0, 0, xi])

@@ -37,28 +37,32 @@ qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 
 _, _, J = TS.torsionalstiffness(sect)
 
-case = 2    # 1 = loading + bending, 2 = only bending, 3 = only loading
+case = 1    # 1 = loading + bending, 2 = only bending, 3 = only loading
 if case == 1:
     # Case with loadings, and bending
     load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
     P = 97.4e3
     fname = "Jambent"
     d1, d3 = 0.01154, 0.0184
+    f = 1
 elif case == 2:
     # Case with no loadings, and bending
     load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=0)
     P = 0
     fname = "Bending"
     d1, d3 = 0.01154, 0.0184
+    f = 1
 else:
     load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
     P = 97.4e3
+    fname = "Jamstraight"
     d1, d3 = 0, 0
+    f = -1
 
 
 MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=28e9, E_i=73.1e9, 
-            La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=0.01154, 
-            d3_i=0.0184, xa_i=0.35, theta_i=np.radians(28), P_i=P)
+            La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=d1, 
+            d3_i=d3, xa_i=0.35, theta_i=np.radians(28), P_i=P)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system(power=0, power_t=2)
 MC.do_plots()
 path = 'Validation/nodes.txt'
@@ -124,7 +128,7 @@ mag_num = ((disp_num[1])**2 + (disp_num[2]**2))**0.5
 
 # setup MSE
 
-MSE = 1/np.shape(disp_num)[0] * sum((mag_num-hingeline[4]/1000)**2)
+MSE = np.sqrt(1/np.shape(disp_num)[0] * sum((mag_num-hingeline[4]/1000)**2))
 print("MSE = ",MSE)
 
 
@@ -133,7 +137,7 @@ print("MSE = ",MSE)
 fig = plt.figure()
 
 ax = Axes3D(fig)
-ax.scatter(hingeline[1]/1000,-1*hingeline[2]/1000,-1*hingeline[3]/1000, label="Validation model")
+ax.scatter(hingeline[1]/1000,f*-1*hingeline[2]/1000,-1*hingeline[3]/1000, label="Validation model")
 ax.scatter(disp_num[0],-1*disp_num[1],-1*disp_num[2], label="Numerical model")
 ax.set_xlabel('x [m]')
 ax.set_ylabel('y-displacement [m]')
@@ -141,7 +145,7 @@ ax.set_zlabel('z-displacement [m]')
 plt.legend()
 plt.show()
 
-plt.plot(hingeline[1]/1000,-1*hingeline[2]/1000, label="Validation model", marker="x", linewidth=0)
+plt.plot(hingeline[1]/1000,f*-1*hingeline[2]/1000, label="Validation model", marker="x", linewidth=0)
 plt.plot(disp_num[0],-1*disp_num[1], label="Numerical model", marker="x", linewidth=0)
 plt.xlabel("x [m]")
 plt.ylabel("y-displacement [m]")

@@ -15,6 +15,7 @@ class stress():
 		self.T = T
 		self.stresses = []
 		self.shear_flows = []
+		self.shear_stress = []
 		self.vm_stresses = []
 		self.r = sect.r
 		self.beta = sect.beta
@@ -80,10 +81,12 @@ class stress():
 	def stress_norm_xx(self, y, z):
 		return self.Mz / self.Izz * y + self.My / self.Iyy * z
 
-	def add_vonMises(self, y, z, stress, shear, t):
+	def add_vonMises(self, y, z, stress, q, t):
 		z -= self.zc
-		vm = math.sqrt(stress ** 2  + 3 * (shear / t) ** 2)
+		shear_stress = q[0] / t
+		vm = math.sqrt(stress ** 2  + 3 * shear_stress ** 2)
 		self.vm_stresses.append([z, y, vm])
+		self.shear_stress.append([z, y, shear_stress])
 
 	def plot(self, data, fname, label, x):
 		z, y, s = data[:,0], data[:,1], data[:,2]

@@ -51,7 +51,7 @@ file.close()
 # for item in data_frame:
 #     print(item)
 
-path = 'data/Displ_jamstraight.csv'
+path = 'data/Jambent_result.csv'
 file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
 file.close()
@@ -117,6 +117,7 @@ for x in lst_x:  # x is mm
     x = x/1000
     s = STR.stress(MC.Mz(x), MC.My(x), MC.Sz(x), MC.Sy(x), MC.T(x), sect, q1, q2, q3, q4, q5, q6, show_plot=False)
     s.section_stress()
+    
     vm = np.array(s.vm_stresses)
     ss = np.array(s.shear_stress)
     b = ss[:, -1]
@@ -124,11 +125,13 @@ for x in lst_x:  # x is mm
     vmss = np.concatenate((vm, b), axis=1)
     numericaldata[x] = vmss
 
+
+
 def get_stresses(x,y,z):  # all inputs are mm
     vmss = numericaldata[x/1000]
     distance = np.sum((vmss[:, 0:2] - np.array([z/1000, y/1000])) ** 2, axis=1)
     indice = np.argmin(distance)
-    print(x, y, z, vmss[indice, 2:])
+    #print(x, y, z, vmss[indice, 2:])
     return vmss[indice, 2:]
 
 
@@ -151,9 +154,10 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
             section_data[i,0:4] = list(item)
             section_data[i,4:] = get_stresses(x, item[0], item[1])
         section_data = section_data.transpose()
-        print(section_data[2:4])
-        local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2] - section_data[4]*10**6)])
-        local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3] - section_data[5]*10**6)])
+        #local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2]*10**6/1e9 - section_data[4]/1e9)])
+        #local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3]*10**6/1e9 - section_data[5]/1e9)])
+        local_mse_miss = sum(section_data[2]*10**6/1e9 - section_data[4]/1e9)/len(section_data[2])
+        local_mse_shear = sum(section_data[3]*10**6/1e9 - section_data[5]/1e9)/len(section_data[3])
 
         xloc.append(round(x,6))
         # print(local_mse_miss,local_mse_shear)
@@ -163,143 +167,13 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
         incompletex.append(x)
 
 
-'''
-for numb in range(np.shape(next_section)[0]):
-    section_data = np.zeros((62, 6))
-
-    #print(next_section[0:40])
-    # spacing of complete 24.6856995‬mm
-
-    # first check for section completeness (62 points)
-    i = 0
-    for j in range(np.shape(data)[0]):
-        if data[j,0] == next_section[numb]:
-            i += 1
-
-    # if section complete --> get out data for particular layer from the data array
-    if i == 62:
-        k = 0
-        for j in range(np.shape(data)[0]):
-            if data[j,0] == next_section[numb]:
-                section_data[k,0] = data[j,1]
-                section_data[k,1] = data[j,2]
-                section_data[k,2] = data[j,3]
-                section_data[k,3] = data[j,4]
-                k += 1
-
-
-        section_data =section_data.transpose()
-
-
-        #plt.scatter(section_data[1],section_data[0],c=section_data[2])
-        #plt.colorbar()
-        #plt.show()
-
-
-    ############################# setup error testing ################################
-
-    # section data only populated by validation model, the two colums left to be filled by sampling the numerical model.
-
-
-    # local_mse_miss = 1/62 * sum((section_data[2]-section_data[4]))**2
-    # local_mse_shear = 1/62 * sum((section_data[3]-section_data[5]))**2
-
-    local_mse_miss = 1 / 62 * sum([i ** 2 for i in (section_data[2] - section_data[4])])
-    local_mse_shear = 1 / 62 * sum([i ** 2 for i in (section_data[3] - section_data[5])])
-
-    # store result in list
-    xloc.append(round(next_section[numb],6))
-    discr_miss.append(local_mse_miss)
-    discr_shear.append(local_mse_shear)
-'''
-
 
 # plot list of error
-print(sum(xloc),sum(discr_miss),sum(discr_shear))
-plt.plot(xloc, discr_miss, xloc, discr_shear)
+print(sum(discr_miss),sum(discr_shear))
+plt.scatter(xloc, discr_miss, label="vm", marker="x", s=5)
+plt.scatter(xloc, discr_shear, label="shear", marker="x", s=5)
+plt.legend()
+plt.xlabel("x [m]")
+plt.ylabel("stress [GPa]")
 plt.show()
 
-
-
-'''
-# 3d plot the sections that are incomplete --> to check what is their physical
-incomplete = []
-
-for k in range(np.shape(next_section)[0]):
-    i = 0
-    current_section = []
-    for j in range(np.shape(data)[0]):
-        if data[j, 0] == next_section[k]:
-            i += 1
-            current_section.append(data[j,:])
-    if i != 62:
-        incomplete.append(current_section)
-
-incomplete = np.concatenate(incomplete,axis=0)
-
-print(np.shape(incomplete))
-
-'''
-'''
-section_data = np.zeros((62,3))
-
-
-# select a cross section place to monitor the stresses
-#print(next_section)
-numb = 1
-
-# define starting point of complete section
-i = 0
-found = False
-k = 0
-while found == False:
-    i = 0
-    for j in range(np.shape(data)[0]):
-        if data[j,0] == next_section[k]:
-            i += 1
-    k += 1
-    if i == 62:
-        found = True
-
-start_int = k-1
-
-
-# find the discepancies between next_section
-
-dummy = np.zeros(np.shape(next_section))
-dummy[1:] = next_section[0:-1]
-
-spacing = next_section-dummy
-
-#print(next_section[start_int]+spacing[start_int+1])
-#print(next_section[start_int], next_section[start_int+1])
-
-i = 0
-for j in range(np.shape(data)[0]):
-    if data[j,0] == next_section[numb]:
-        i += 1
-
-# if section complete --> get out data for particular layer from the data array
-if i != 62:
-    for j in range(np.shape(data)[0]):
-        if data[j,0] == next_section[numb]:
-            data[j,:] = 0
-            k += 1
-
-
-for j in range(np.shape(data)[0]):
-    if data[j,0] >= xloc[loc_int] - 0.2*step and data[j,0] <= xloc[loc_int] + 0.2*step:
-        section_data[k,0] = data[j,1]
-        section_data[k,1] = data[j,2]
-        section_data[k,2] = data[j,3]
-        k += 1
-
-section_data =section_data.transpose()
-
-plt.scatter(section_data[1],section_data[0],c=section_data[2])
-plt.colorbar()
-plt.show()
-
-############################################# working code to plot slicewise but with guesswork for spacing #########
-
-'''

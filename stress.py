@@ -103,10 +103,10 @@ class stress():
 		plt.colorbar(cax=cax, label=label)
 		plt.set_cmap("jet")
 		plt.savefig(f"plots/stresses/{fname}-{str(x).replace('.', '-')}.pdf", bbox_inches='tight')
-		#z_line = np.arange(-0.2, 0.2, 0.001)
-		#alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
-		#y_line = [z_c * np.sin(alpha) for z_c in z_line]
-		#plt.plot(z_line, y_line)
+		z_line = np.arange(-0.2, 0.2, 0.001)
+		alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
+		y_line = [z_c * np.sin(alpha) for z_c in z_line]
+		plt.plot(z_line, y_line)
 		if self.show_plot:
 			plt.show()
 		else:

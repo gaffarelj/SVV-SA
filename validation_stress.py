@@ -141,7 +141,7 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
         incompletex.append(x)
 
 # plot list of error
-print(sum(discr_miss),sum(discr_shear))
+print(sum(discr_miss)/len(discr_miss),sum(discr_shear)/len(discr_shear))
 plt.scatter(xloc, discr_miss, label="vm", marker="x", s=5)
 plt.scatter(xloc, discr_shear, label="shear", marker="x", s=5)
 plt.legend()

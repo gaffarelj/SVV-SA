@@ -219,7 +219,7 @@ def shear_centre(n):
     print('Redundant shear flow in cell II is', qsII, '[N/m], clockwise positive')
 
     def q1_v(theta):
-        q = qb_1(theta) #+ qsI
+        q = qb_1(theta) + qsI
         return q
 
     def q2_v(s):
@@ -300,8 +300,9 @@ def shear_centre(n):
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-# qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
-
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+print(xi)
+print(-0.09185594953325857+sect.r)
 ##Verification
 # our_zc = xi - sect.r
 # print("our zc:", our_zc)

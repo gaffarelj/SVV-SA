@@ -7,10 +7,14 @@ import macaulay as MC
 import stress as STR
 import sectionproperties as SP
 import shearcentre as SC
+import torsionstiffness as TS
 
 sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
 SC.set_sect(sect)
 qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
+_, _, J = TS.torsionalstiffness(sect)
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
 
 def scatter3d(x,y,z, cs):
     fig = plt.figure()
@@ -111,6 +115,9 @@ numericaldata = {}  # x:[z,y,vm,ss]
 for x in lst_x:
     print(x)
     s = STR.stress(MC.Mz(x), MC.My(x), MC.Sz(x), MC.Sy(x), MC.T(x), sect, q1, q2, q3, q4, q5, q6, show_plot=False)
+    vm = s.vm_stresses
+    ss = s.shear_flows
+
     # vmss = s.somthing()
     numericaldata[x] = vmss
 
@@ -204,7 +211,8 @@ for numb in range(np.shape(next_section)[0]):
 
 # plot list of error
 print(sum(xloc),sum(discr_miss),sum(discr_shear))
-plt.plot(xloc,discr_miss,xloc,discr_shear)
+plt.plot(xloc, discr_miss, xloc, discr_shear)
+plt.show()
 
 
 

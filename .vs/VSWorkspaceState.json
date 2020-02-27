@@ -2,9 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\data",
-    "\\validation",
     "\\verification"
   ],
-  "SelectedNode": "\\Validation_elements.py",
+  "SelectedNode": "\\Validation_displacement.py",
   "PreviewInSolutionExplorer": false
 }

@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\data",
+    "\\validation",
+    "\\verification"
   ],
   "SelectedNode": "\\main.py",
   "PreviewInSolutionExplorer": false

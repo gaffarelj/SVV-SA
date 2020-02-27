@@ -5,6 +5,7 @@ from interpolation import get_load
 import numpy as np
 from integration import integrate as S
 import matplotlib.pyplot as plt
+plt.gcf().subplots_adjust(left=0.25)
 
 
 xi, J = None, None
@@ -16,6 +17,7 @@ theta, P = None, None
 Izz, Iyy = None, None
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = None, None, None, None, None, None, None, None, None, None, None, None
 f2, f3, f5, fq, fd = None, None, None, None, None
+load = None
 
 
 # MACAULAY
@@ -114,9 +116,9 @@ def system():
     A = np.array([eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, eq9, eq10, eq11, eq12])
     y = np.array([res1, res2, res3, res4, res5, res6, res7, res8, res9, res10, res11, res12])
     print("Macaulay: solving system...")
-    Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.lstsq(A, y, rcond=None)[0]
-    #Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
-    return  Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
+    #Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.lstsq(A, y, rcond=None)[0]
+    Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = np.linalg.solve(A, y)
+    return Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
 
 
 # INTERPOLATION
@@ -157,7 +159,12 @@ def coefficients_tau(power=6, chord_steps=300, span_steps=150):
     return a
 
 def q_aero(x, chord_steps=300, span_steps=150):  # x goes from 0 to span steps-1
-    section_coordinates, section_loads = get_load(n_chord=chord_steps, n_span=span_steps, do_plot=False)
+    global load
+    if load is None:
+        section_coordinates, section_loads = get_load(n_chord=chord_steps, n_span=span_steps, do_plot=False)
+        load = section_coordinates, section_loads
+    else:
+        section_coordinates, section_loads = load
     int_x = np.zeros((1, 3))
     sum_chord = 0
     sum_moments = 0
@@ -250,30 +257,30 @@ def Sy(x):
 def v(x):
     core = -S(fq, 0, x)
     if x > x1:
-        core += Ry1 * (x - x1) ** 3
+        core += (Ry1/6) * (x - x1) ** 3
     if x > x2 - (xa / 2):
-        core += math.sin(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+        core += math.sin(theta) * (Fa/6) * (x - (x2 - (xa / 2))) ** 3
     if x > x2:
-        core += Ry2 * (x - x2) ** 3
+        core += (Ry2/6) * (x - x2) ** 3
     if x > x2 + (xa / 2):
-        core -= math.sin(theta) * P * (x - (x2 + (xa / 2))) ** 3
+        core -= math.sin(theta) * (P/6) * (x - (x2 + (xa / 2))) ** 3
     if x > x3:
-        core += Ry3 * (x - x3) ** 3
+        core += (Ry3/6) * (x - x3) ** 3
     v = -(1 / (E * Izz)) * core + C1 * x + C2
     return v
 
 def w(x):
     core = 0
     if x > x1:
-        core -= Rz1 * (x - x1) ** 3
+        core -= (Rz1/6) * (x - x1) ** 3
     if x > x2 - (xa / 2):
-        core -= math.cos(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+        core -= math.cos(theta) * (Fa/6) * (x - (x2 - (xa / 2))) ** 3
     if x > x2:
-        core -= Rz2 * (x - x2) ** 3
+        core -= (Rz2/6) * (x - x2) ** 3
     if x > x2 + (xa / 2):
-        core += math.cos(theta) * P * (x - (x2 + (xa / 2))) ** 3
+        core += math.cos(theta) * (P/6) * (x - (x2 + (xa / 2))) ** 3
     if x > x3:
-        core -= Rz3 * (x - x3) ** 3
+        core -= (Rz3/6) * (x - x3) ** 3
     v = -(1 / (E * Iyy)) * core + C3 * x + C4
     return v
 
@@ -293,22 +300,40 @@ def alpha(x): #Check!
     angle = math.degrees(alpha)
     return -alpha
 
-def plot_result(f, legend, show_plot=False, dx=0.005):
+def plot_result(f, legend, title, show_plot=False, dx=0.005):
     x = np.arange(0.0, La, dx)
     y = [f(xi) for xi in x]
     plt.plot(x, y)
-    plt.title(f"{legend}(x)")
     if show_plot: plt.show()
-    plt.savefig(f"plots/macaulay/{legend}.pdf")
+    plt.ylabel(title)
+    plt.xlabel("x [m]")
+    plt.savefig(f"plots/macaulay/{legend}.pdf", bbox_inches='tight')
     plt.close()
 
 def do_plots():
-    plot_result(alpha, "alpha")
-    plot_result(w, "w")
-    plot_result(v, "v")
-    plot_result(Sy, "Sy")
-    plot_result(Sz, "Sz")
-    plot_result(T, "T")
-    plot_result(My, "My")
-    plot_result(Mz, "Mz")
+    plot_result(alpha, "alpha", "Twist [rad]")
+    plot_result(w, "w", "Displacement in the XXX")
+    plot_result(v, "v", "Displacement in the XXX")
+    plot_result(Sy, "Sy", "Shear in the y-direction [N]")
+    plot_result(Sz, "Sz", "Shear in the z-direction [N]")
+    plot_result(T, "T", "Torque around x [Nm]")
+    plot_result(My, "My", "Bending moment around z [Nm]")
+    plot_result(Mz, "Mz", "Bending moment around y [Nm]")
 
+    # Plot bendings
+    xs = np.arange(0, 1.691, 0.001)
+    fig, ax1 = plt.subplots()
+    ax1.set_xlabel('x [m]')
+    color = 'tab:red'
+    ax1.set_ylabel('bending moment around z [Nm]', color=color)
+    ax1.plot(xs, [Mz(x) for x in xs], color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+
+    color = 'tab:blue'
+    ax2.set_ylabel('bending moment around y [Nm]', color=color)
+    ax2.plot(xs, [My(x) for x in xs], color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    plt.savefig(f"plots/macaulay/bendings_n.pdf", bbox_inches='tight')
+    plt.close()

@@ -1,5 +1,6 @@
 from integration import integrate as S
 import sectionproperties as SP
+from torsionstiffness import torsionalstiffness
 import numpy as np
 
 sect = None
@@ -107,7 +108,7 @@ def q_horizontal_3(s3):  # SECTION 3: 0 to l_topskin
         q_booms = 0
         for i in range(8, 8 + nbooms):
             q_booms += sect.stiff_area * sect.boomcoords[i, 0]
-        q_skin = sect.tskin * S(lambda x: x * np.cos(sect.beta) + sect.z_centroid, 0, s3)
+        q_skin = -sect.tskin * S(lambda x: x * np.cos(sect.beta) + sect.z_centroid, 0, s3)
         q = c * (q_skin + q_booms) + q_horizontal_1(np.pi / 2) + q_horizontal_2(sect.r)
     return q
 
@@ -270,33 +271,36 @@ def shear_centre(n):
     xi = -(m1 + m3 + m4 + m6)
 
     # TOTAL EQUATIONS
-    def q1(theta, Sz, Sy):
-        q = q1_v(theta) * Sy + q_horizontal_1(theta) * Sz
+
+    q0I, q0II, _ = torsionalstiffness(sect)
+
+    def q1(theta, Sz, Sy, T):
+        q = q1_v(theta) * Sy + q_horizontal_1(theta) * Sz + T * q0I
         return q
 
-    def q2(s, Sz, Sy):
-        q = q2_v(s) * Sy + q_horizontal_2(s) * Sz
+    def q2(s, Sz, Sy, T):
+        q = q2_v(s) * Sy + q_horizontal_2(s) * Sz + T * (q0II - q0I)
         return q
 
-    def q3(s, Sz, Sy):
-        q = q3_v(s) * Sy + q_horizontal_3(s) * Sz
+    def q3(s, Sz, Sy, T):
+        q = q3_v(s) * Sy + q_horizontal_3(s) * Sz + T * q0II
         return q
 
-    def q4(s, Sz, Sy):
-        q = q4_v(s) * Sy + q_horizontal_4(s) * Sz
+    def q4(s, Sz, Sy, T):
+        q = q4_v(s) * Sy + q_horizontal_4(s) * Sz + T * q0II
         return q
 
-    def q5(s, Sz, Sy):
-        q = q5_v(s) * Sy + q_horizontal_5(s) * Sz
+    def q5(s, Sz, Sy, T):
+        q = q5_v(s) * Sy + q_horizontal_5(s) * Sz + T * (q0I - q0II)
         return -q
 
-    def q6(theta, Sz, Sy):
-        q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz
+    def q6(theta, Sz, Sy, T):
+        q = q6_v(theta) * Sy + q_horizontal_6(theta) * Sz + T * q0I
         return q
 
     return qsI, qsII, q1, q2, q3, q4, q5, q6, xi
 
-#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
+# qsI, qsII, q1, q2, q3, q4, q5, q6, xi = shear_centre(1000)
 
 ##Verification
 # our_zc = xi - sect.r

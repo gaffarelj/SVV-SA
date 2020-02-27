@@ -9,19 +9,40 @@ import shearcentre as SC
 import macaulay as MC
 import torsionstiffness as TS
 import stress as STR
+import interpolation as I
 
-sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+def validation_booms():
+    zy1 = [0.1025, 0]
+    zy2 = [0.06558, 0.07878]
+    zy3 = [-0.01831, 0.09876]
+    zy4 = [-0.10635, 0.08081]
+    zy5 = [-0.19438, 0.06285]
+    zy6 = [-0.28241, 0.04489]
+    zy7 = [-0.37045, 0.02694]
+    zy8 = [-0.45848, 0.00898]
+    zy9 = [-0.45848, -0.00898]
+    zy10 = [-0.37045, -0.02694]
+    zy11 = [-0.28241, -0.04489]
+    zy12 = [-0.19438, -0.06285]
+    zy13 = [-0.10635, -0.08081]
+    zy14 = [-0.01831, -0.09876]
+    zy15 = [0.06558, -0.07878]
+    return np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13, zy14, zy15])
+
+sect = SP.section(Nstiffeners=15, Ha=0.205, Ca=0.605, tskin=0.0011, tspar=0.0028,
+                    hstiff=0.016, tstiff=0.0012, wstiff=0.019, booms=validation_booms())
 
 SC.set_sect(sect)
-#qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
-xi = -0.007513567161803937
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 
 _, _, J = TS.torsionalstiffness(sect)
 
-MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
+load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
+
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=28e9, E_i=73.1e9, 
+            La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=0.01154, 
+            d3_i=0.0184, xa_i=0.35, theta_i=np.radians(28), P_i=97.4e3)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
-MC.do_plots()
-#MC.plot_result(MC.My, "My_b")
 
 path = 'Validation/nodes.txt'
 file = open(path, "r")

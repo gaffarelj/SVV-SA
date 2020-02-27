@@ -21,9 +21,12 @@ load = None
 
 
 # MACAULAY
-def set_vars(xi_i, J_i, r_i, Izz_i, Iyy_i, G_i=28e9, E_i=73.1e9, La_i=1.691, x1_i=0.149, x2_i=0.554, x3_i=1.541, d1_i=0.00681, d3_i=0.0203, xa_i=0.272, theta_i=np.radians(26), P_i=37.9e3):
-    global xi, J, La, x1, x2, x3, xa, d1, d3, r, G, E, theta, P, Izz, Iyy
-    xi, J, La, x1, x2, x3, xa, d1, d3, r, G, E, theta, P, Izz, Iyy = xi_i, J_i, La_i, x1_i, x2_i, x3_i, xa_i, d1_i, d3_i, r_i, G_i, E_i, theta_i, P_i, Izz_i, Iyy_i
+def set_vars(xi_i, J_i, r_i, Izz_i, Iyy_i, G_i=28e9, E_i=73.1e9, La_i=1.691, 
+             x1_i=0.149, x2_i=0.554, x3_i=1.541, d1_i=0.00681, d3_i=0.0203, 
+             xa_i=0.272, theta_i=np.radians(26), P_i=37.9e3, load_i=None):
+    global xi, J, La, x1, x2, x3, xa, d1, d3, r, G, E, theta, P, Izz, Iyy, load
+    xi, J, La, x1, x2, x3, xa, d1, d3, r, G, E, theta, P, Izz, Iyy, load = \
+        xi_i, J_i, La_i, x1_i, x2_i, x3_i, xa_i, d1_i, d3_i, r_i, G_i, E_i, theta_i, P_i, Izz_i, Iyy_i, load_i
 
 # Solve for unknowns
 # Unknowns are, in order, [Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5]

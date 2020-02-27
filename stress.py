@@ -5,7 +5,7 @@ import matplotlib as mpl
 import math
 
 class stress():
-	def __init__(self, Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6):
+	def __init__(self, Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6, show_plot=True):
 		self.Iyy = sect.Iyy
 		self.Izz = sect.Izz
 		self.Mz = Mz
@@ -24,6 +24,7 @@ class stress():
 		self.q1, self.q2, self.q3, self.q4, self.q5, self.q6 = q1, q2, q3, q4, q5, q6
 		self.tskin = sect.tskin
 		self.tspar = sect.tspar
+		self.show_plot = show_plot
 
 	def section_stress(self):
 		# Hinge
@@ -103,7 +104,10 @@ class stress():
 		#alpha = np.arctan(-self.My*self.Izz/self.Mz/self.Iyy)
 		#y_line = [z_c * np.sin(alpha) for z_c in z_line]
 		#plt.plot(z_line, y_line)
-		plt.show()
+		if self.show_plot:
+			plt.show()
+		else:
+			plt.close()
 
 	def plot_all(self, x):
 		self.plot(np.array(self.stresses), "s", "Normal stress [Pa]", x)

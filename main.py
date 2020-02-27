@@ -26,8 +26,6 @@ for x in [0.418, 0.544]:
 	T = MC.T(x)
 	s = STR.stress(Mz, My, Sz, Sy, T, sect, q1, q2, q3, q4, q5, q6, show_plot=False)
 	s.section_stress()
-	print(s.shear_stress)
-	input()
 	s.plot_all(x)
 
 input("Press ENTER to (re-)find the maximum stress location...")

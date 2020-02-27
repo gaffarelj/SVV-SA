@@ -251,30 +251,30 @@ def Sy(x):
 def v(x):
     core = -S(fq, 0, x)
     if x > x1:
-        core += Ry1 * (x - x1) ** 3
+        core += (Ry1/6) * (x - x1) ** 3
     if x > x2 - (xa / 2):
-        core += math.sin(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+        core += math.sin(theta) * (Fa/6) * (x - (x2 - (xa / 2))) ** 3
     if x > x2:
-        core += Ry2 * (x - x2) ** 3
+        core += (Ry2/6) * (x - x2) ** 3
     if x > x2 + (xa / 2):
-        core -= math.sin(theta) * P * (x - (x2 + (xa / 2))) ** 3
+        core -= math.sin(theta) * (P/6) * (x - (x2 + (xa / 2))) ** 3
     if x > x3:
-        core += Ry3 * (x - x3) ** 3
+        core += (Ry3/6) * (x - x3) ** 3
     v = -(1 / (E * Izz)) * core + C1 * x + C2
     return v
 
 def w(x):
     core = 0
     if x > x1:
-        core -= Rz1 * (x - x1) ** 3
+        core -= (Rz1/6) * (x - x1) ** 3
     if x > x2 - (xa / 2):
-        core -= math.cos(theta) * Fa * (x - (x2 - (xa / 2))) ** 3
+        core -= math.cos(theta) * (Fa/6) * (x - (x2 - (xa / 2))) ** 3
     if x > x2:
-        core -= Rz2 * (x - x2) ** 3
+        core -= (Rz2/6) * (x - x2) ** 3
     if x > x2 + (xa / 2):
-        core += math.cos(theta) * P * (x - (x2 + (xa / 2))) ** 3
+        core += math.cos(theta) * (P/6) * (x - (x2 + (xa / 2))) ** 3
     if x > x3:
-        core -= Rz3 * (x - x3) ** 3
+        core -= (Rz3/6) * (x - x3) ** 3
     v = -(1 / (E * Iyy)) * core + C3 * x + C4
     return v
 

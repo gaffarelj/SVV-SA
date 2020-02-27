@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None, do_plot=False):
+def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None, do_plot=False, fixed_load=None):
 	"""
 	Get the aerodynamic load.
 	Inputs:
@@ -13,6 +13,16 @@ def get_load(C_a=0.484, l_a=1.691, n_span=None, n_chord=None, do_plot=False):
 		- n_span: number of points to which to interpolate the load, span-wise
 		- n_chord: number of points to which to interpolate the load, chord-wise
 	"""
+	if fixed_load is not None:
+		span_x_coords = interp_coords(list(np.linspace(0, l_a, 20)), n_span, 20, l_a, "x")
+		sections_data = []
+		for x in span_x_coords:
+			sections_data.append([x, [[0.25*C_a, fixed_load]]])
+		if do_plot:
+			plot_data(sections_data)
+		return span_x_coords, sections_data
+	
+
 	f = open("data/aerodynamicloadcrj700.dat").readlines()	# Open the aerodynamic load
 	data = []
 	N_z, N_x = len(f), len(f[0].split(","))			# The number of z/x coordinates = number of rows/columns
@@ -157,3 +167,8 @@ def interp_two_points(new_coord, point_a, point_b, load_a, load_b):
 	# The load at the new coordinate is interpolated by fitting a line to the known
 	# load before and after that new coordinate
 	return load_a + (new_coord - point_a) * (load_b - load_a) / (point_b - point_a)
+
+## Get load by opening a file
+#get_load(n_span=100, n_chord=150, do_plot=True)
+## Get load with fixed load at 25% chord
+#get_load(C_a=0.605, l_a=2.661, n_span=100, do_plot=True, fixed_load=5540)

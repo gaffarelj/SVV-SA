@@ -2,6 +2,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
+import macaulay as MC
+import stress as STR
+import sectionproperties as SP
+import shearcentre as SC
+sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
+SC.set_sect(sect)
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
 
 def scatter3d(x,y,z, cs):
     fig = plt.figure()
@@ -98,6 +105,21 @@ xloc = []
 
 lst_x = sorted(list(next_section))
 
+# get stress for given x,y,z
+numericaldata = {}  # x:[z,y,vm,ss]
+for x in lst_x:
+    print(x)
+    s = STR.stress(MC.Mz(x), MC.My(x), MC.Sz(x), MC.Sy(x), MC.T(x), sect, q1, q2, q3, q4, q5, q6, show_plot=False)
+    # vmss = s.somthing()
+    numericaldata[x] = vmss
+
+def get_stresses(x,y,z):
+    sectionstress = numericaldata[x]
+    for row in sectionstress:
+        if row[0] == z and row[1] == y:
+            return list(row[2:])
+
+
 for x in lst_x:
     section_data = np.zeros((62, 6))
 
@@ -109,11 +131,12 @@ for row in data:  # row = [x,y,z,vm,ss]
     else:
         sections[row[0]] = [row[1:]]
 
-for x, info in sections.items():
+for x, info in sections.items():  # info=[[y,z,vm,ss],........]
     if len(info) == 62:
         section_data = np.zeros((62, 6))
         for i, item in enumerate(info):
             section_data[i,0:4] = list(item)
+            section_data[i,4:] = get_stresses(x, item[0], item[1])
         section_data = section_data.transpose()
         local_mse_miss = 1 / 62 * sum([i**2 for i in (section_data[2] - section_data[4])])
         local_mse_shear = 1 / 62 * sum([i**2 for i in (section_data[3] - section_data[5])])
@@ -177,25 +200,6 @@ for numb in range(np.shape(next_section)[0]):
 # plot list of error
 print(sum(xloc),sum(discr_miss),sum(discr_shear))
 plt.plot(xloc,discr_miss,xloc,discr_shear)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

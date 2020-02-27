@@ -30,7 +30,7 @@ for x in [0.418, 0.544]:
 
 input("Press ENTER to (re-)find the maximum stress location...")
 # Find maximum stress location
-max_s, max_s_x, max_q, max_q_x, max_vm, max_vm_x = MS.get_max(MC.Mz, MC.My, MC.Sz, MC.Sy, sect, q1, q2, q3, q4, q5, q6, do_plot=False)
+max_s, max_s_x, max_q, max_q_x, max_vm, max_vm_x = MS.get_max(MC.Mz, MC.My, MC.Sz, MC.Sy, MC.T, sect, q1, q2, q3, q4, q5, q6, do_plot=False)
 print(max_s, max_s_x)
 print(max_q, max_q_x)
 print(max_vm, max_vm_x)

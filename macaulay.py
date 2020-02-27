@@ -30,7 +30,7 @@ def set_vars(xi_i, J_i, r_i, Izz_i, Iyy_i, G_i=28e9, E_i=73.1e9, La_i=1.691,
 
 # Solve for unknowns
 # Unknowns are, in order, [Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5]
-def system():
+def system(power=10):
     global Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5
     global f2, f3, f5, fq, fd
     print("Macaulay:")
@@ -41,10 +41,13 @@ def system():
     eq1 = np.array([0, 0, 0, -(La - x1), -(La - x2), -(La - x3), -math.cos(theta) * (La - (x2 - (xa / 2))), 0, 0, 0, 0, 0])
     res1 = np.array([-P * math.cos(theta) * (La - (x2 + (xa / 2)))])
     
-    new_c2 = np.zeros((11, 1))
-    for i in range(11):
+    new_c2 = np.zeros((power+1, 1))
+    for i in range(power+1):
         new_c2[i, 0] = a[i, 0] / (i + 1)
-    f2 = lambda x: new_c2[0, 0] * x + new_c2[1, 0] * x ** 2 + new_c2[2, 0] * x ** 3 + new_c2[3, 0] * x ** 4 + \
+    if power == 0:
+        f2 = lambda x: new_c2[0, 0] * x
+    else:
+        f2 = lambda x: new_c2[0, 0] * x + new_c2[1, 0] * x ** 2 + new_c2[2, 0] * x ** 3 + new_c2[3, 0] * x ** 4 + \
                    new_c2[4, 0] * x ** 5 + new_c2[5, 0] * x ** 6 + new_c2[6, 0] * x ** 7 + new_c2[7, 0] * x ** 8 + \
                    new_c2[8, 0] * x ** 9 + new_c2[9, 0] * x ** 10 + new_c2[10, 0] * x ** 11
     integral2 = S(f2, 0, La)
@@ -61,17 +64,23 @@ def system():
     eq4 = np.array([0, 0, 0, -1, -1, -1, -math.cos(theta), 0, 0, 0, 0, 0])
     res4 = np.array([-P * math.cos(theta)])
     
-    f5 = lambda x: a[0, 0] + a[1, 0] * x + a[2, 0] * x ** 2 + a[3, 0] * x ** 3 + a[4, 0] * x ** 4 + a[5, 0] * x ** 5 + a[
+    if power == 0:
+        f5 = lambda x: a[0, 0]
+    else:
+        f5 = lambda x: a[0, 0] + a[1, 0] * x + a[2, 0] * x ** 2 + a[3, 0] * x ** 3 + a[4, 0] * x ** 4 + a[5, 0] * x ** 5 + a[
         6, 0] * x ** 6 + a[7, 0] * x ** 7 + a[8, 0] * x ** 8 + a[9, 0] * x ** 9 + a[10, 0] * x ** 10
     integral5 = S(f5, 0, La)
     eq5 = np.array([1, 1, 1, 0, 0, 0, math.sin(theta), 0, 0, 0, 0, 0])
     res5 = np.array([P * math.sin(theta) + integral5])
 
     # Quadruple q function
-    new_cq = np.zeros((11, 1))
-    for i in range(11):
+    new_cq = np.zeros((power+1, 1))
+    for i in range(power+1):
         new_cq[i, 0] = a[i, 0] / ((i + 1) * (i + 2) * (i + 3))
-    fq = lambda x: new_cq[0, 0] * x ** 3 + new_cq[1, 0] * x ** 4 + new_cq[2, 0] * x ** 5 + new_cq[3, 0] * x ** 6 + \
+    if power == 0:
+        fq = lambda x: new_cq[0, 0] * x ** 3
+    else:
+        fq = lambda x: new_cq[0, 0] * x ** 3 + new_cq[1, 0] * x ** 4 + new_cq[2, 0] * x ** 5 + new_cq[3, 0] * x ** 6 + \
                    new_cq[4, 0] * x ** 7 + new_cq[5, 0] * x ** 8 + new_cq[6, 0] * x ** 9 + new_cq[7, 0] * x ** 10 + \
                    new_cq[8, 0] * x ** 11 + new_cq[9, 0] * x ** 12 + new_cq[10, 0] * x ** 13
 

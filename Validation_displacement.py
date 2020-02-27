@@ -30,7 +30,7 @@ def validation_booms():
     return np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13, zy14, zy15])
 
 sect = SP.section(Nstiffeners=15, Ha=0.205, Ca=0.605, tskin=0.0011, tspar=0.0028,
-                    hstiff=0.016, tstiff=0.0012, wstiff=0.019, booms=validation_booms())
+                    hstiff=0.016, tstiff=0.0012, wstiff=0.019, booms=validation_booms(), remove_booms=True)
 
 SC.set_sect(sect)
 qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
@@ -39,11 +39,11 @@ _, _, J = TS.torsionalstiffness(sect)
 
 load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
 
-MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=28e9, E_i=73.1e9, 
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=27.1e9, E_i=73.1e9, 
             La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=0.01154, 
             d3_i=0.0184, xa_i=0.35, theta_i=np.radians(28), P_i=97.4e3)
-Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
-
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system(power=0)
+MC.do_plots()
 path = 'Validation/nodes.txt'
 file = open(path, "r")
 nodes = np.genfromtxt(path, delimiter=",", skip_header=0 )

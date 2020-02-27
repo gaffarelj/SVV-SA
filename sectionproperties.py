@@ -10,7 +10,7 @@ Inputs are below, as given in Aircraft Data, coded for CRJ700.
 
 class section():
     def __init__(self, Nstiffeners=13, Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025,
-                    hstiff=0.014, tstiff=0.0012, wstiff=0.018, booms=None):
+                    hstiff=0.014, tstiff=0.0012, wstiff=0.018, booms=None, remove_booms=False):
         self.Nstiffeners = Nstiffeners  # This is actually hard coded by get_boomcoords
         self.Ha = Ha
         self.Ca = Ca
@@ -33,6 +33,9 @@ class section():
         self.boomcoords_hinge = self.boomcoords
         # stiffener area (in meters^2)
         self.stiff_area = (self.hstiff + self.wstiff) * self.tstiff     # small angle approximation is used
+        if remove_booms:
+            self.tskin += Nstiffeners * self.stiff_area
+            self.stiff_area = 0
         # enclosed area (in meters^2)
         self.Am = np.pi * self.r ** 2 + self.l_spar_to_end * self.r
         self.comp_centroid()

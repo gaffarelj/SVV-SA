@@ -16,6 +16,7 @@ _, _, J = TS.torsionalstiffness(sect)
 
 MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
 Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
+print("Plotting Macaulay results...")
 MC.do_plots()
 
 print("Computing stress and generating plots at most critical locations...")

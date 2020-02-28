@@ -8,13 +8,25 @@ import stress as STR
 import sectionproperties as SP
 import shearcentre as SC
 import torsionstiffness as TS
+import interpolation as I
 
-sect = SP.section(Ha=0.173, Ca=0.484, tskin=0.0011, tspar=0.0025, hstiff=0.014, tstiff=0.0012, wstiff=0.018)
-SC.set_sect(sect)
-qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
-_, _, J = TS.torsionalstiffness(sect)
-MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy)
-Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system()
+def validation_booms():
+    zy1 = [0.1025, 0]
+    zy2 = [0.06558, 0.07878]
+    zy3 = [-0.01831, 0.09876]
+    zy4 = [-0.10635, 0.08081]
+    zy5 = [-0.19438, 0.06285]
+    zy6 = [-0.28241, 0.04489]
+    zy7 = [-0.37045, 0.02694]
+    zy8 = [-0.45848, 0.00898]
+    zy9 = [-0.45848, -0.00898]
+    zy10 = [-0.37045, -0.02694]
+    zy11 = [-0.28241, -0.04489]
+    zy12 = [-0.19438, -0.06285]
+    zy13 = [-0.10635, -0.08081]
+    zy14 = [-0.01831, -0.09876]
+    zy15 = [0.06558, -0.07878]
+    return np.array([zy1, zy2, zy3, zy4, zy5, zy6, zy7, zy8, zy9, zy10, zy11, zy12, zy13, zy14, zy15])
 
 def scatter3d(x,y,z, cs):
     fig = plt.figure()
@@ -38,11 +50,45 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Bending_result_notext_dat.csv'
+case = 2
+if case == 1:
+    # Bending, no loading
+    load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=0)
+    P = 0
+    fname = "Bending"
+    d1, d3 = 0.01154, 0.0184
+elif case == 2:
+    # Loading, and bending
+    load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
+    P = 97.4e3
+    fname = "Jambent"
+    d1, d3 = 0.01154, 0.0184
+else:
+    # Loading, no bending
+    load = I.get_load(C_a=0.605, l_a=2.661, n_span=150, do_plot=False, fixed_load=5540)
+    P = 97.4e3
+    fname = "Jamstraight"
+    d1, d3 = 0, 0
+
+    
+path = f'data/{fname}_result.csv'
+    
+
+sect = SP.section(Nstiffeners=15, Ha=0.205, Ca=0.605, tskin=0.0011, tspar=0.0028,
+                    hstiff=0.016, tstiff=0.0012, wstiff=0.019, booms=validation_booms(), remove_booms=True)
+SC.set_sect(sect)
+qsI, qsII, q1, q2, q3, q4, q5, q6, xi = SC.shear_centre(1000)
+_, _, J = TS.torsionalstiffness(sect)
+
+MC.set_vars(xi, J, sect.r, sect.Izz, sect.Iyy, G_i=28e9, E_i=73.1e9, 
+            La_i=2.661, x1_i=0.172, x2_i=1.211, x3_i=2.591, d1_i=d1, 
+            d3_i=d3, xa_i=0.35, theta_i=np.radians(28), P_i=P)
+Ry1, Ry2, Ry3, Rz1, Rz2, Rz3, Fa, C1, C2, C3, C4, C5 = MC.system(power=0, power_t=2)
+
 file = open(path, "r")
-lines = ' '.join([s.replace(',', '.') for s in file.readlines()])
-data_frame = np.genfromtxt(BytesIO(lines.encode('utf-8')), delimiter=';', dtype=np.float32)
+data_frame = np.genfromtxt(file.readlines(), delimiter=',', dtype=np.float32)
 file.close()
+
 path = 'data/Jambent_result.csv'
 file = open(path, "r")
 displ_dat = np.genfromtxt(path, delimiter=",", skip_header=3)
@@ -99,7 +145,7 @@ for x in lst_x:  # x is mm
     vm = np.array(s.vm_stresses)
     ss = np.array(s.shear_stress)
     b = ss[:, -1]
-    b = b.reshape(522,1)
+    b = b.reshape(620,1)
     vmss = np.concatenate((vm, b), axis=1)
     numericaldata[x] = vmss
 print()
@@ -130,8 +176,8 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
             section_data[i,0:4] = list(item)
             section_data[i,4:] = get_stresses(x, item[0], item[1])
         section_data = section_data.transpose()
-        local_mae_miss = sum(np.abs(section_data[2]*10**6/1e9 - section_data[4]/1e9))/len(section_data[2])
-        local_mae_shear = sum(np.abs(section_data[3]*10**6/1e9 - section_data[5]/1e9))/len(section_data[3])
+        local_mae_miss = sum(np.fabs(section_data[2]*10**6/1e9 - section_data[4]/1e9))/len(section_data[2])
+        local_mae_shear = sum(np.fabs(section_data[3]*10**6/1e9 - section_data[5]/1e9))/len(section_data[3])
 
         xloc.append(round(x,6))
         # print(local_mse_miss,local_mse_shear)
@@ -141,10 +187,10 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
         incompletex.append(x)
 
 # plot list of error
-print(sum(discr_miss)/len(discr_miss),sum(discr_shear)/len(discr_shear))
-plt.scatter(xloc, discr_miss, label="vm", marker="x", s=5)
-plt.scatter(xloc, discr_shear, label="shear", marker="x", s=5)
+print(np.nanmean(discr_miss),np.nanmean(discr_shear))
+plt.scatter([x/1000 for x in xloc], discr_miss, label="von Mises stress", marker="x", s=5)
+plt.scatter([x/1000 for x in xloc], discr_shear, label="Shear stress", marker="x", s=5)
 plt.legend()
 plt.xlabel("x [m]")
 plt.ylabel("stress [GPa]")
-plt.show()
+plt.savefig(f"plots/validation/stress_{case}.pdf", bbox_inches='tight')

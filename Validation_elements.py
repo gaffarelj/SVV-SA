@@ -40,13 +40,18 @@ file = open(path, "r")
 elements = np.genfromtxt(path, delimiter=",", skip_header=0)
 file.close()
 
-path = 'data/Bending_result_notext_dat.csv'
+# path = 'data/Bending_result_notext_dat.csv'
+# path = 'data/Jamstraight_result2.csv'
+path = 'data/Jambent_result.csv'
 file = open(path, "r")
-lines = ' '.join([s.replace(',', '.') for s in file.readlines()])
-data_frame = np.genfromtxt(BytesIO(lines.encode('utf-8')), delimiter=';', dtype=np.float32)
-# data_frame = np.genfromtxt(path, delimiter=";", skip_header=0, dtype=float)
+# lines = ' '.join([s.replace(',', '.') for s in file.readlines()])
+# data_frame = np.genfromtxt(BytesIO(lines.encode('utf-8')), delimiter=';', dtype=np.float32)
+data_frame = np.genfromtxt(path, delimiter=",", skip_header=0)
 # data_frame = pd.read_csv(path,delimiter=";")
 file.close()
+
+for row in data_frame:
+    print(row)
 
 # for item in data_frame:
 #     print(item)
@@ -169,7 +174,7 @@ for x, info in sections.items():  # info=[[y,z,vm,ss],........]
 
 
 # plot list of error
-print(sum(discr_miss),sum(discr_shear))
+print(sum(discr_miss)/len(lst_x),sum(discr_shear)/len(lst_x))
 plt.scatter(xloc, discr_miss, label="vm", marker="x", s=5)
 plt.scatter(xloc, discr_shear, label="shear", marker="x", s=5)
 plt.legend()
